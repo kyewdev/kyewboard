@@ -13,14 +13,14 @@ import (
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
-	quest := db.Quest{Id: 1, Message: "WRITE A GO SERVER USING TEMPL", Accepted: false, Reward: "+ 1000 in GO", Assignee: "kyew"}
+	quest := db.Quest{Id: 1, Message: "WRITE A GO SERVER USING TEMPL TAIL WIND AND HTMX", Status: "Pending", Reward: "+ 1000 GO-Exp", Assignee: "kyew"}
 
 	component := view.Index(quest)
 	// quests := make([]Quest)
 
 	// quests := append(quests, quest)
 
-	e.Static("/assets", "dist")
+	e.Static("/static", "/assets")
 
 	e.GET("/", func(c echo.Context) error {
 		return component.Render(context.Background(), c.Response().Writer)

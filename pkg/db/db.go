@@ -3,7 +3,7 @@ package db
 type Quest struct {
 	Id       int
 	Message  string
-	Accepted bool
+	Status   string
 	Reward   string
 	Assignee string
 }
