@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/view"
@@ -25,6 +26,13 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return component.Render(context.Background(), c.Response().Writer)
 	})
-
+    e.POST("/accepted", func(c echo.Context) error {
+        quest.Status = "Accepted"
+        return c.String(http.StatusOK, quest.Status)
+    })
+    e.POST("/declined", func(c echo.Context) error {
+        quest.Status = "Declined"
+        return c.String(http.StatusOK, quest.Status)
+    })
 	e.Logger.Fatal(e.Start(":42069"))
 }

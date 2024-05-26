@@ -17,7 +17,7 @@ templ Index(quest db.Quest) {
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/static/style.css" rel="stylesheet"/>
-			<script type="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
+            <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		</head>
 		<body>
 			@HelloDiv(quest.Assignee)
@@ -33,10 +33,10 @@ templ Quest(quest db.Quest) {
         <p class="text-left block mb-2">{quest.Message}</p>
         <p class="text-left font-bold font-morpheus">Reward:</p>
         <p class="text-left ">{quest.Reward}</p>
-        <p class="text-left mb-2">Status: {quest.Status}</p>
+        <p class="text-left mb-2" id="status">Status: {quest.Status}</p>
         <div class="flex w-full mt-4">
-            <button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2">Accept</button>
-            <button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2">Decline</button>
+            <button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Accept</button>
+            <button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
         </div>
     </div>
 }

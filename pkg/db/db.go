@@ -6,4 +6,6 @@ type Quest struct {
 	Status   string
 	Reward   string
 	Assignee string
+    Questtype string
+    Category string
 }
