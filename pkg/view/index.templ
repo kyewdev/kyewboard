@@ -5,7 +5,7 @@ import "strconv"
 
 templ HelloDiv(name string) {
 	<div class="flex flex-col justify-center items-center">
-    hello {name}
+        <h1 class="text-center text-6xl">hello {name}</h1>
   	</div>
 }
 
@@ -21,16 +21,22 @@ templ Index(quest db.Quest) {
 		</head>
 		<body>
 			@HelloDiv(quest.Assignee)
-			<div class="border border-blue-500 bg-blue-100 p-6 inline-block">
-				<h1 class="text-center mb-4">The Quest {strconv.Itoa(quest.Id)}</h1>
-				<p class="text-left mb-2">Task: {quest.Message}</p>
-				<p class="text-left">Reward {quest.Reward}</p>
-				<p class="text-left mb-2">Status: {quest.Status}</p>
-				<div class="flex w-full mt-4">
-					<button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2">Accept</button>
-					<button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2">Decline</button>
-				</div>
-			</div>
+            @Quest(quest)
     	</body>
 	</html>
+}
+
+templ Quest(quest db.Quest) {
+    <div class="border border-blue-500 bg-blue-100 p-6 inline-block">
+        <h1 class="text-center text-4xl font-morpheus font-bold mb-4">The Quest {strconv.Itoa(quest.Id)}</h1>
+        <p class="text-left block font-bold font-morpheus mb-2">Objective:</p>
+        <p class="text-left block mb-2">{quest.Message}</p>
+        <p class="text-left font-bold font-morpheus">Reward:</p>
+        <p class="text-left ">{quest.Reward}</p>
+        <p class="text-left mb-2">Status: {quest.Status}</p>
+        <div class="flex w-full mt-4">
+            <button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2">Accept</button>
+            <button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2">Decline</button>
+        </div>
+    </div>
 }
