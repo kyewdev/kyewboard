@@ -24,7 +24,7 @@ func main() {
 	e.Static("/static", "/assets")
 
 	e.GET("/", func(c echo.Context) error {
-		return component.Render(context.Background(), c.Response().Writer)
+        return component.Render(context.Background(), c.Response().Writer)
 	})
     e.POST("/accepted", func(c echo.Context) error {
         quest.Status = "Accepted"
