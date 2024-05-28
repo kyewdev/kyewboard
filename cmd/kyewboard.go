@@ -7,6 +7,7 @@ import (
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/view"
 
+	
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -20,19 +21,24 @@ func main() {
 	// quests := make([]Quest)
 
 	// quests := append(quests, quest)
-
+	
 	e.Static("/static", "/assets")
 
 	e.GET("/", func(c echo.Context) error {
         return component.Render(context.Background(), c.Response().Writer)
 	})
+
     e.POST("/accepted", func(c echo.Context) error {
         quest.Status = "Accepted"
-        return c.String(http.StatusOK, quest.Status)
+        completebtn := view.CompleteDiv()
+        return completebtn.Render(context.Background(),c.Response().Writer)
+
     })
+
     e.POST("/declined", func(c echo.Context) error {
         quest.Status = "Declined"
         return c.String(http.StatusOK, quest.Status)
     })
+
 	e.Logger.Fatal(e.Start(":42069"))
 }

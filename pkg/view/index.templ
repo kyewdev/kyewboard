@@ -34,9 +34,17 @@ templ Quest(quest db.Quest) {
         <p class="text-left font-bold font-morpheus">Reward:</p>
         <p class="text-left ">{quest.Reward}</p>
         <p class="text-left mb-2" id="status">Status: {quest.Status}</p>
-        <div class="flex w-full mt-4">
-            <button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Accept</button>
-            <button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
-        </div>
+        @AcceptDiv()
     </div>
+}
+
+templ AcceptDiv() {
+    <div class="flex w-full mt-4" id="hi">
+        <button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="closest #hi" hx-swap="innerHTML">Accept</button>
+        <button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
+    </div>
+}
+
+templ CompleteDiv() { 
+    <button class="border border-blue-500 bg-white py-2 px-4 w-1/2 justify-center" hx-post="/completed" hx-trigger="click">Complete Quest</button>
 }
