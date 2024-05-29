@@ -9,7 +9,7 @@ templ HelloDiv(name string) {
   	</div>
 }
 
-templ Index(quest db.Quest) {
+templ Index(quest db.Quest, player db.Player) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -20,8 +20,9 @@ templ Index(quest db.Quest) {
             <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		</head>
 		<body>
-			@HelloDiv(quest.Assignee)
+			@HelloDiv(player.Name)
             @Quest(quest)
+            @Status(player)
     	</body>
 	</html>
 }
@@ -47,4 +48,8 @@ templ AcceptDiv() {
 
 templ CompleteDiv() { 
     <button class="border border-blue-500 bg-white py-2 px-4 w-1/2 justify-center" hx-post="/completed" hx-trigger="click">Complete Quest</button>
+}
+
+templ Status(player db.Player) {
+   <div>{player.Name}</div> 
 }

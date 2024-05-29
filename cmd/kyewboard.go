@@ -12,12 +12,31 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+func NewPlayer() db.Player {
+    skills := map[string]int{
+        "Vitality": 0,
+        "Strength": 0,
+        "Inteligence": 0,
+        "Sense": 0,
+        "Agility": 0,
+    }
+
+    return db.Player{
+        Skills : skills,
+        Experience : 0,
+        Level : 1,
+        Id : 1,
+        Name : "Kyew",
+    }
+}
+
+
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	quest := db.Quest{Id: 1, Message: "WRITE A GO SERVER USING TEMPL TAIL WIND AND HTMX", Status: "Pending", Reward: "+ 1000 GO-Exp", Assignee: "kyew"}
-
-	component := view.Index(quest)
+    player := NewPlayer()
+	component := view.Index(quest, player)
 	// quests := make([]Quest)
 
 	// quests := append(quests, quest)
