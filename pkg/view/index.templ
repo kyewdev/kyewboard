@@ -5,51 +5,116 @@ import "strconv"
 
 templ HelloDiv(name string) {
 	<div class="flex flex-col justify-center items-center">
-        <h1 class="text-center text-6xl">hello {name}</h1>
-  	</div>
+		<h1 class="text-center text-6xl">hello { name }</h1>
+	</div>
 }
 
 templ Index(quest db.Quest, player db.Player) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="dark">
 		<head>
 			<title>Kyewboard</title>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/static/style.css" rel="stylesheet"/>
-            <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		</head>
-		<body>
+		<body class="bg-gray-900 text-white">
 			@HelloDiv(player.Name)
-            @Quest(quest)
-            @Status(player)
-    	</body>
+			@Quest(quest)
+			@Status(player)
+			@Category()
+			@gptQuest()
+		</body>
 	</html>
 }
 
 templ Quest(quest db.Quest) {
-    <div class="border border-blue-500 bg-blue-100 p-6 inline-block">
-        <h1 class="text-center text-4xl font-morpheus font-bold mb-4">The Quest {strconv.Itoa(quest.Id)}</h1>
-        <p class="text-left block font-bold font-morpheus mb-2">Objective:</p>
-        <p class="text-left block mb-2">{quest.Message}</p>
-        <p class="text-left font-bold font-morpheus">Reward:</p>
-        <p class="text-left ">{quest.Reward}</p>
-        <p class="text-left mb-2" id="status">Status: {quest.Status}</p>
-        @AcceptDiv()
+	<div class="max-w-4xl mx-auto p-6 mt-8">
+		<div class="w-full bg-blue-900 border border-blue-500 p-6 rounded-lg inline-block shadow-md">
+			<h1 class="text-center text-4xl font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
+			<div class="w-full container space-y-4">
+                <p class="text-left block font-bold font-morpheus mb-2">Objective:</p>
+			    @Objective(quest)
+                @Objective(quest)
+                @Objective(quest)
+            </div>
+            <p class="text-left font-bold font-morpheus">Reward:</p>
+			<p class="text-left ">{ quest.Reward }</p>
+			<p class="text-left mb-2" id="status">Status: { quest.Status }</p>
+			@CompleteDiv()
+		</div>
+	</div>
+}
+
+templ Objective(quest db.Quest) {
+	<div class="flex justify-between w-full relative">
+        <label class="flex-grow text-left">- { quest.Message }</label>
+        <label class="text-right">[0/1]</label>
     </div>
 }
 
 templ AcceptDiv() {
-    <div class="flex w-full mt-4" id="hi">
-        <button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="closest #hi" hx-swap="innerHTML">Accept</button>
-        <button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
-    </div>
+	<div class="flex w-full mt-4" id="hi">
+		<button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="closest #hi" hx-swap="innerHTML">Accept</button>
+		<button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
+	</div>
 }
 
-templ CompleteDiv() { 
-    <button class="border border-blue-500 bg-white py-2 px-4 w-1/2 justify-center" hx-post="/completed" hx-trigger="click">Complete Quest</button>
+templ CompleteDiv() {
+	<div class="flex w-full mt-4 justify-center">
+		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click">Complete Quest</button>
+	</div>
 }
 
 templ Status(player db.Player) {
-   <div>{player.Name}</div> 
+	<div class="max-w-4xl mx-auto p-6 mt-8">
+		<div class="bg-blue-900 border border-blue-500 p-6 rounded-lg shadow-md">
+			<h2 class="text-2xl font-bold mb-4">Player Status</h2>
+			<p class="mb-2"><strong>Name:</strong> { player.Name }</p>
+			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(player.Level) }</p>
+			<div class="bg-blue-400 p-4 rounded-lg">
+				<p class="mb-2"><strong>Strength:</strong> 120</p>
+				<p class="mb-2"><strong>Agility:</strong> 110</p>
+				<p class="mb-2"><strong>Intelligence:</strong> 100</p>
+				<p class="mb-2"><strong>Endurance:</strong> 95</p>
+			</div>
+		</div>
+	</div>
+}
+
+templ Category() {
+	<div class="max-w-4xl mx-auto p-6 mt-8">
+		<div class="bg-blue-900 p-6 border border-blue-500 rounded-lg shadow-md">
+			<h2 class="text-2xl font-bold mb-4">Skills</h2>
+			<div class="bg-blue-400 p-4 rounded-lg mb-4">
+				<h3 class="text-xl font-semibold">Skill Name: Swordsmanship</h3>
+				<p class="mb-2"><strong>Level:</strong> 5</p>
+				<p class="mb-2"><strong>Experience:</strong> 350/500 XP</p>
+				<div class="flex space-x-4">
+					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Skill</button>
+					<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Skill</button>
+				</div>
+			</div>
+			<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create New Skill</button>
+		</div>
+	</div>
+}
+
+templ gptQuest() {
+	<div class="max-w-4xl mx-auto border-blue-500 p-6">
+		<div class="bg-blue-900 border-blue-500 p-6 rounded-lg shadow-md">
+			<h2 class="text-2xl font-bold mb-4">Current Quests</h2>
+			<div class="bg-blue-400 p-4 rounded-lg mb-4">
+				<h3 class="text-xl font-semibold">Quest Name: Defeat the Goblin King</h3>
+				<p class="mb-2"><strong>Objective:</strong> Defeat the Goblin King in the Dungeon</p>
+				<p class="mb-2"><strong>Rewards:</strong> 500 XP, Goblin King's Sword</p>
+				<div class="flex space-x-4">
+					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Quest</button>
+					<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Quest</button>
+				</div>
+			</div>
+			<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create New Quest</button>
+		</div>
+	</div>
 }

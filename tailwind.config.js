@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
     module.exports = {
         content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
-         theme: {
+        darkMode: 'class',
+        theme: {
             extend: {
                 fontFamily: {
                     morpheus: ['Morpheus', 'serif'],
@@ -10,7 +11,7 @@
                     questText: '#DAA520', // Color similar to WoW quest text
                 },
             },
-         },
+        },
         safelist: [],
     }
 
