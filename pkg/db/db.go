@@ -4,7 +4,8 @@ type Quest struct {
 	Id       int
 	Message  string
 	Status   string
-	Reward   string
+    Objectives []string
+	Rewards   []string
 	Assignee string
     Questtype string
     Category string

@@ -11,7 +11,7 @@ templ HelloDiv(name string) {
 
 templ Index(quest db.Quest, player db.Player) {
 	<!DOCTYPE html>
-	<html lang="en" class="dark">
+	<html lang="en" class="">
 		<head>
 			<title>Kyewboard</title>
 			<meta charset="UTF-8"/>
@@ -31,27 +31,37 @@ templ Index(quest db.Quest, player db.Player) {
 
 templ Quest(quest db.Quest) {
 	<div class="max-w-4xl mx-auto p-6 mt-8">
-		<div class="w-full bg-blue-900 border border-blue-500 p-6 rounded-lg inline-block shadow-md">
-			<h1 class="text-center text-4xl font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
+		<div class="w-full bg-blue-900 border border-[#text-cyan-400] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
+			<h1 class="text-center text-4xl text-[#daf6fc] font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
 			<div class="w-full container space-y-4">
-                <p class="text-left block font-bold font-morpheus mb-2">Objective:</p>
-			    @Objective(quest)
-                @Objective(quest)
-                @Objective(quest)
-            </div>
-            <p class="text-left font-bold font-morpheus">Reward:</p>
-			<p class="text-left ">{ quest.Reward }</p>
+				<div class="w-full text-gray-200 container space-y-4">
+					<p class="text-left text-[#daf6fc] lock font-bold font-morpheus mb-2">Objective:</p>
+					for i := range quest.Objectives {
+						@Objective(quest.Objectives[i])
+					}
+				</div>
+				<div class="w-full">
+					<p class="text-left  text-[#daf6fc] font-bold font-morpheus">Reward:</p>
+					for i := range quest.Rewards {
+						@Reward(quest.Rewards[i])
+					}
+				</div>
+			</div>
 			<p class="text-left mb-2" id="status">Status: { quest.Status }</p>
 			@CompleteDiv()
 		</div>
 	</div>
 }
 
-templ Objective(quest db.Quest) {
-	<div class="flex justify-between w-full relative">
-        <label class="flex-grow text-left">- { quest.Message }</label>
-        <label class="text-right">[0/1]</label>
-    </div>
+templ Reward(reward string) {
+	<p class="w-full relative">{ reward }</p>
+}
+
+templ Objective(objective string) {
+	<div class="flex justify-between  w-full relative">
+		<label class="flex-grow text-left">- { objective }</label>
+		<label class="text-right">[0/1]</label>
+	</div>
 }
 
 templ AcceptDiv() {

@@ -33,8 +33,11 @@ func NewPlayer() db.Player {
 
 func main() {
 	e := echo.New()
-	e.Use(middleware.Logger())
-	quest := db.Quest{Id: 1, Message: "WRITE A GO SERVER USING TEMPL TAIL WIND AND HTMX", Status: "Pending", Reward: "+ 1000 GO-Exp", Assignee: "kyew"}
+    e.Use(middleware.Logger())
+
+    rewards := []string{"+1000 GO Exp", "+1000 Html Exp"}
+    objectives := []string{"Setup GO Server", "Setup Templ", "Setup Air"}
+    quest := db.Quest{Id: 1, Message: "WRITE A GO SERVER USING TEMPL TAIL WIND AND HTMX", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
     player := NewPlayer()
 	component := view.Index(quest, player)
 	// quests := make([]Quest)
@@ -58,6 +61,9 @@ func main() {
         quest.Status = "Declined"
         return c.String(http.StatusOK, quest.Status)
     })
-
+    
+    e.POST("/completed", func(c echo.Context) error {
+        return component.Render(context.Background(), c.Response().Writer)
+    })
 	e.Logger.Fatal(e.Start(":42069"))
 }
