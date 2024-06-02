@@ -19,19 +19,19 @@ templ Index(quest db.Quest, player db.Player) {
 			<link href="/static/style.css" rel="stylesheet"/>
 			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		</head>
-		<body class="bg-gray-900 text-white">
-			@HelloDiv(player.Name)
+		<body class="bg-gray-900 text-white relative">
 			@Quest(quest)
 			@Status(player)
-			@Category()
-			@gptQuest()
+            for _,v := range player.Skills {
+                @Skill(v)
+            }
 		</body>
 	</html>
 }
 
 templ Quest(quest db.Quest) {
 	<div class="max-w-4xl mx-auto p-6 mt-8">
-		<div class="w-full bg-blue-900 border border-[#text-cyan-400] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
+		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
 			<h1 class="text-center text-4xl text-[#daf6fc] font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
 			<div class="w-full container space-y-4">
 				<div class="w-full text-gray-200 container space-y-4">
@@ -54,7 +54,9 @@ templ Quest(quest db.Quest) {
 }
 
 templ Reward(reward string) {
-	<p class="w-full relative">{ reward }</p>
+	<div class="flex relative">
+		<p class="w-full relative">{ reward }</p>
+	</div>
 }
 
 templ Objective(objective string) {
@@ -78,12 +80,12 @@ templ CompleteDiv() {
 }
 
 templ Status(player db.Player) {
-	<div class="max-w-4xl mx-auto p-6 mt-8">
-		<div class="bg-blue-900 border border-blue-500 p-6 rounded-lg shadow-md">
-			<h2 class="text-2xl font-bold mb-4">Player Status</h2>
+	<div class="max-w-4xl absolute top-0 right-0 mx-auto p-6 mt-8">
+		<div class="bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg shadow-md">
+			<h2 class="text-2xl text-center font-bold font-morpheus text-[#daf6fc] mb-4">Status</h2>
 			<p class="mb-2"><strong>Name:</strong> { player.Name }</p>
 			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(player.Level) }</p>
-			<div class="bg-blue-400 p-4 rounded-lg">
+			<div class="bg-blue-400 bg-opacity-20 p-4 rounded-lg">
 				<p class="mb-2"><strong>Strength:</strong> 120</p>
 				<p class="mb-2"><strong>Agility:</strong> 110</p>
 				<p class="mb-2"><strong>Intelligence:</strong> 100</p>
@@ -93,38 +95,17 @@ templ Status(player db.Player) {
 	</div>
 }
 
-templ Category() {
+templ Skill(skill db.Skill) {
 	<div class="max-w-4xl mx-auto p-6 mt-8">
-		<div class="bg-blue-900 p-6 border border-blue-500 rounded-lg shadow-md">
-			<h2 class="text-2xl font-bold mb-4">Skills</h2>
-			<div class="bg-blue-400 p-4 rounded-lg mb-4">
-				<h3 class="text-xl font-semibold">Skill Name: Swordsmanship</h3>
-				<p class="mb-2"><strong>Level:</strong> 5</p>
-				<p class="mb-2"><strong>Experience:</strong> 350/500 XP</p>
-				<div class="flex space-x-4">
-					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Skill</button>
-					<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Skill</button>
-				</div>
+		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-20 rounded-lg shadow-md">
+			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{skill.Title}</h2>
+			<p class="mb-2"><strong>Level:</strong> {strconv.Itoa(skill.Level)}</p>
+			<p class="mb-2"><strong>Experience:</strong> {strconv.Itoa(skill.Experience)}/500 XP</p>
+            <p class="mb-2"><strong>Category:</strong> {skill.Category}</p>
+			<div class="flex space-x-4">
+				<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Skill</button>
+				<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Skill</button>
 			</div>
-			<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create New Skill</button>
-		</div>
-	</div>
-}
-
-templ gptQuest() {
-	<div class="max-w-4xl mx-auto border-blue-500 p-6">
-		<div class="bg-blue-900 border-blue-500 p-6 rounded-lg shadow-md">
-			<h2 class="text-2xl font-bold mb-4">Current Quests</h2>
-			<div class="bg-blue-400 p-4 rounded-lg mb-4">
-				<h3 class="text-xl font-semibold">Quest Name: Defeat the Goblin King</h3>
-				<p class="mb-2"><strong>Objective:</strong> Defeat the Goblin King in the Dungeon</p>
-				<p class="mb-2"><strong>Rewards:</strong> 500 XP, Goblin King's Sword</p>
-				<div class="flex space-x-4">
-					<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Quest</button>
-					<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Quest</button>
-				</div>
-			</div>
-			<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create New Quest</button>
 		</div>
 	</div>
 }

@@ -17,6 +17,13 @@ type Player struct {
     Id int
     Level int
     Experience int
-    Skills map[string]int
+    Skills map[string]Skill
+    Stats map[string]int
 }
 
+type Skill struct {
+    Category string
+    Level int
+    Experience int
+    Title string
+}

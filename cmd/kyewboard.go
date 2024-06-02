@@ -13,16 +13,29 @@ import (
 )
 
 func NewPlayer() db.Player {
-    skills := map[string]int{
+    stats := map[string]int{
         "Vitality": 0,
         "Strength": 0,
         "Inteligence": 0,
         "Sense": 0,
         "Agility": 0,
     }
-
+    dev := db.Skill{Title: "Development", Category: "IT", Level: 1, Experience: 1,}
+    sec := db.Skill{Title: "IT Security", Category: "IT", Level: 1, Experience: 1,}
+    skate := db.Skill{Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1,}
+    garden := db.Skill{Title: "Gardening", Category: "Biology", Level: 1, Experience: 1,}
+    rocketleauge := db.Skill{Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1,}
+    
+    skills := map[string]db.Skill{
+        "Development": dev,
+        "IT Security": sec,
+        "Skateboarding": skate,
+        "Gardening": garden,
+        "Rocketleague": rocketleauge,
+    }
     return db.Player{
-        Skills : skills,
+        Stats : stats,
+        Skills: skills,
         Experience : 0,
         Level : 1,
         Id : 1,
@@ -37,7 +50,7 @@ func main() {
 
     rewards := []string{"+1000 GO Exp", "+1000 Html Exp"}
     objectives := []string{"Setup GO Server", "Setup Templ", "Setup Air"}
-    quest := db.Quest{Id: 1, Message: "WRITE A GO SERVER USING TEMPL TAIL WIND AND HTMX", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
+    quest := db.Quest{Id: 1, Message: "Kyewboard setup quest", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
     player := NewPlayer()
 	component := view.Index(quest, player)
 	// quests := make([]Quest)
