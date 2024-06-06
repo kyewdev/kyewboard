@@ -53,6 +53,7 @@ func main() {
     quest := db.Quest{Id: 1, Message: "Kyewboard setup quest", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
     player := NewPlayer()
 	component := view.Index(quest, player)
+    body := view.Body(quest, player)
 	// quests := make([]Quest)
 
 	// quests := append(quests, quest)
@@ -76,7 +77,7 @@ func main() {
     })
     
     e.POST("/completed", func(c echo.Context) error {
-        return component.Render(context.Background(), c.Response().Writer)
+        return body.Render(context.Background(), c.Response().Writer)
     })
 	e.Logger.Fatal(e.Start(":42069"))
 }

@@ -11,7 +11,7 @@ templ HelloDiv(name string) {
 
 templ Index(quest db.Quest, player db.Player) {
 	<!DOCTYPE html>
-	<html lang="en" class="">
+	<html lang="en"> 
 		<head>
 			<title>Kyewboard</title>
 			<meta charset="UTF-8"/>
@@ -19,20 +19,24 @@ templ Index(quest db.Quest, player db.Player) {
 			<link href="/static/style.css" rel="stylesheet"/>
 			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		</head>
-		<body class="bg-gray-900 text-white relative">
-			@Quest(quest)
-			@Status(player)
-            for _,v := range player.Skills {
-                @Skill(v)
-            }
-		</body>
+		@Body(quest, player)
 	</html>
+}
+
+templ Body(quest db.Quest, player db.Player) {
+	<body class="bg-gray-900 text-white relative" id="body">
+		@Quest(quest)
+		@Status(player)
+		for _,v := range player.Skills {
+			@Skill(v)
+		}
+	</body>
 }
 
 templ Quest(quest db.Quest) {
 	<div class="max-w-4xl mx-auto p-6 mt-8">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
-			<h1 class="text-center text-4xl text-[#daf6fc] font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
+			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
 			<div class="w-full container space-y-4">
 				<div class="w-full text-gray-200 container space-y-4">
 					<p class="text-left text-[#daf6fc] lock font-bold font-morpheus mb-2">Objective:</p>
@@ -75,7 +79,7 @@ templ AcceptDiv() {
 
 templ CompleteDiv() {
 	<div class="flex w-full mt-4 justify-center">
-		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click">Complete Quest</button>
+		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click" hx-target="#body">Complete Quest</button>
 	</div>
 }
 
@@ -98,10 +102,10 @@ templ Status(player db.Player) {
 templ Skill(skill db.Skill) {
 	<div class="max-w-4xl mx-auto p-6 mt-8">
 		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-20 rounded-lg shadow-md">
-			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{skill.Title}</h2>
-			<p class="mb-2"><strong>Level:</strong> {strconv.Itoa(skill.Level)}</p>
-			<p class="mb-2"><strong>Experience:</strong> {strconv.Itoa(skill.Experience)}/500 XP</p>
-            <p class="mb-2"><strong>Category:</strong> {skill.Category}</p>
+			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{ skill.Title }</h2>
+			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(skill.Level) }</p>
+			<p class="mb-2"><strong>Experience:</strong> { strconv.Itoa(skill.Experience) }/500 XP</p>
+			<p class="mb-2"><strong>Category:</strong> { skill.Category }</p>
 			<div class="flex space-x-4">
 				<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Skill</button>
 				<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Skill</button>
