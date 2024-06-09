@@ -49,10 +49,10 @@ func main() {
     e.Use(middleware.Logger())
 
     rewards := []string{"+1000 GO Exp", "+1000 Html Exp"}
-    objectives := []string{"Setup GO Server", "Setup Templ", "Setup Air"}
+    objectives := []string{"Setup GO Server", "Setup Templ", "Setup Air", "testing multiline long objecttive omg hi new line wtattat" }
     quest := db.Quest{Id: 1, Message: "Kyewboard setup quest", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
     player := NewPlayer()
-	component := view.Index(quest, player)
+	index := view.Index(quest, player)
     body := view.Body(quest, player)
 	// quests := make([]Quest)
 
@@ -61,7 +61,7 @@ func main() {
 	e.Static("/static", "/assets")
 
 	e.GET("/", func(c echo.Context) error {
-        return component.Render(context.Background(), c.Response().Writer)
+        return index.Render(context.Background(), c.Response().Writer)
 	})
 
     e.POST("/accepted", func(c echo.Context) error {
@@ -78,6 +78,18 @@ func main() {
     
     e.POST("/completed", func(c echo.Context) error {
         return body.Render(context.Background(), c.Response().Writer)
+    })
+
+    e.POST("/toggletask", func(c echo.Context) error {
+        checked := c.FormValue("taskcheckbox") == "on"
+        
+        if checked {
+            tasklbl := view.TaskLabelLT("NOT HI")
+            return tasklbl.Render(context.Background(), c.Response().Writer)
+        } else {
+            tasklbl := view.TaskLabel("HI")
+            return tasklbl.Render(context.Background(), c.Response().Writer) 
+        }
     })
 	e.Logger.Fatal(e.Start(":42069"))
 }
