@@ -25,75 +25,30 @@ templ Index(quest db.Quest, player db.Player) {
 
 templ Body(quest db.Quest, player db.Player) {
 	<body class="bg-gray-900 text-white relative" id="body">
-		@Quest(quest)
-		@Status(player)
-		for _,v := range player.Skills {
-			@Skill(v)
-		}
+		@Navbar()
+        @Status(player)
 	</body>
 }
 
-templ Quest(quest db.Quest) {
-	<div class="max-w-2xl mx-auto p-6 mt-8">
-		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
-			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
-			<div class="w-full flex flex-row space-x-4 justify-evenly">
-				<div class="w-2/3 container justify-evenly">
-					<p class="text-left text-[#daf6fc] lock font-bold font-morpheus mb-2">Objectives:</p>
-					for i := range quest.Objectives {
-						@Objective(quest.Objectives[i])
-					}
-				</div>
-				<div class="w-1/3 container justify-evenly">
-					<p class="text-left  text-[#daf6fc] font-bold font-morpheus">Rewards:</p>
-					for i := range quest.Rewards {
-						@Reward(quest.Rewards[i])
-					}
-				</div>
+templ Navbar() {
+	<nav class="bg-gray-800 p-4">
+		<div class="container mx-auto flex justify-between items-center">
+			<a href="#" class="text-white font-morpheus text-2xl font-bold">Kyewboard</a>
+			<div class="space-x-4">
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/home" hx-target="#content" hx-swap="outerHTML">Home</a>
+				<a href="/quests" class="text-gray-300 hover:text-white" hx-on="click" hx-get="/quests" hx-target="#content" hx-swap="outerHTML">Quests</a>
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/status" hx-target="#content" hx-swap="outerHTML">Player Status</a>
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/skills" hx-target="#content" hx-swap="outerHTML">Skills</a>
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/profile" hx-target="#content" hx-swap="outerHTML">Profile</a>
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/settings" hx-target="#content" hx-swap="outerHTML">Settings</a>
 			</div>
-			<p class="text-left mb-2" id="status">Status: { quest.Status }</p>
-			@CompleteDiv()
 		</div>
-	</div>
-}
-
-templ Reward(reward string) {
-	<div class="flex justify-between w-full relative">
-		<label class="w-full relative">{ reward }</label>
-	</div>
-}
-
-templ Objective(objective string) {
-	<div class="flex w-full relative">
-        @TaskLabel(objective)
-		<input id="taskcheckbox" name="taskcheckbox" type="checkbox" class="h-4 w-4 text-blue-600" hx-post="/toggletask" hx-swap="outerHTML" hx-include="#taskcheckbox" hx-trigger="change" hx-target="previous #tasklabel"/>
-	</div>
-}
-
-templ TaskLabel(objective string) {
-	<label id="tasklabel" class="flex-grow text-left">{ objective }</label>
-}
-
-templ TaskLabelLT(objective string) {
-	<label id="tasklabel" class="flex-grow text-left line-through text-gray-500">{ objective }</label>
-}
-
-templ AcceptDiv() {
-	<div class="flex w-full mt-4" id="hi">
-		<button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="closest #hi" hx-swap="innerHTML">Accept</button>
-		<button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
-	</div>
-}
-
-templ CompleteDiv() {
-	<div class="flex w-full mt-4 justify-center">
-		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click" hx-target="#body">Complete Quest</button>
-	</div>
+	</nav>
 }
 
 templ Status(player db.Player) {
-	<div class="max-w-4xl absolute top-0 right-0 mx-auto p-6 mt-8">
-		<div class="bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg shadow-md">
+	<div id="content" class="max-w-4xl absolute justify-center mx-auto p-6 mt-8">
+		<div class="bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg ">
 			<h2 class="text-2xl text-center font-bold font-morpheus text-[#daf6fc] mb-4">Status</h2>
 			<p class="mb-2"><strong>Name:</strong> { player.Name }</p>
 			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(player.Level) }</p>
@@ -105,6 +60,14 @@ templ Status(player db.Player) {
 			</div>
 		</div>
 	</div>
+}
+
+templ Skills(player db.Player) {
+    <div id="content">
+		for _,v := range player.Skills {
+			@Skill(v)
+		}
+    </div>
 }
 
 templ Skill(skill db.Skill) {

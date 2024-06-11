@@ -91,5 +91,11 @@ func main() {
             return tasklbl.Render(context.Background(), c.Response().Writer) 
         }
     })
+    e.GET("/quests", func(c echo.Context) error {
+        return view.QuestPage(quest).Render(context.Background(), c.Response().Writer)
+    })
+
+
+
 	e.Logger.Fatal(e.Start(":42069"))
 }
