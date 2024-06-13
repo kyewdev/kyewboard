@@ -2,11 +2,6 @@ package view
 
 import "kyewboard/pkg/db"
 
-templ HelloDiv(name string) {
-	<div class="flex flex-col justify-center items-center">
-		<h1 class="text-center text-6xl">hello { name }</h1>
-	</div>
-}
 
 templ Index(quest db.Quest, player db.Player) {
 	<!DOCTYPE html>

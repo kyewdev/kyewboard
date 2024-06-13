@@ -60,9 +60,11 @@ func main() {
 	
 	e.Static("/static", "/assets")
 
+
 	e.GET("/", func(c echo.Context) error {
         return index.Render(context.Background(), c.Response().Writer)
 	})
+
 
     e.POST("/accepted", func(c echo.Context) error {
         quest.Status = "Accepted"
@@ -71,36 +73,46 @@ func main() {
 
     })
 
+
     e.POST("/declined", func(c echo.Context) error {
         quest.Status = "Declined"
         return c.String(http.StatusOK, quest.Status)
     })
     
+
     e.POST("/completed", func(c echo.Context) error {
         return body.Render(context.Background(), c.Response().Writer)
     })
 
+
     e.POST("/toggletask", func(c echo.Context) error {
         checked := c.FormValue("taskcheckbox") == "on"
-        
+        objective := c.FormValue("tasklabel")
+
         if checked {
-            tasklbl := view.TaskLabelLT("NOT HI")
+            tasklbl := view.TaskLabelLT(objective)
             return tasklbl.Render(context.Background(), c.Response().Writer)
         } else {
-            tasklbl := view.TaskLabel("HI")
+            tasklbl := view.TaskLabel(objective)
             return tasklbl.Render(context.Background(), c.Response().Writer) 
         }
     })
+
+
     e.GET("/quests", func(c echo.Context) error {
         return view.QuestPage(quest).Render(context.Background(), c.Response().Writer)
     })
+
 
     e.GET("/skills", func(c echo.Context) error {
         return view.Skills(player).Render(context.Background(), c.Response().Writer)
     })
 
+
     e.GET("/status", func(c echo.Context) error {
         return view.Status(player).Render(context.Background(), c.Response().Writer)
     })
+
+
 	e.Logger.Fatal(e.Start(":42069"))
 }
