@@ -1,0 +1,27 @@
+package view
+
+import "kyewboard/pkg/db"
+import "strconv"
+
+templ Skills(player db.Player) {
+    <div id="content">
+		for _,v := range player.Skills {
+			@Skill(v)
+		}
+    </div>
+}
+
+templ Skill(skill db.Skill) {
+	<div class="max-w-2xl mx-auto p-6 mt-8">
+		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-20 rounded-lg shadow-md">
+			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{ skill.Title }</h2>
+			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(skill.Level) }</p>
+			<p class="mb-2"><strong>Experience:</strong> { strconv.Itoa(skill.Experience) }/500 XP</p>
+			<p class="mb-2"><strong>Category:</strong> { skill.Category }</p>
+			<div class="flex space-x-4">
+				<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Skill</button>
+				<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Skill</button>
+			</div>
+		</div>
+	</div>
+}

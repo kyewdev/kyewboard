@@ -1,0 +1,20 @@
+package view
+
+import "kyewboard/pkg/db"
+import "strconv"
+
+templ Status(player db.Player) {
+	<div id="content" class="max-w-4xl  justify-center mx-auto p-6 mt-8">
+		<div class="bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg ">
+			<h2 class="text-2xl text-center font-bold font-morpheus text-[#daf6fc] mb-4">Status</h2>
+			<p class="mb-2"><strong>Name:</strong> { player.Name }</p>
+			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(player.Level) }</p>
+			<div class="bg-blue-400 bg-opacity-20 p-4 rounded-lg">
+				<p class="mb-2"><strong>Strength:</strong> 120</p>
+				<p class="mb-2"><strong>Agility:</strong> 110</p>
+				<p class="mb-2"><strong>Intelligence:</strong> 100</p>
+				<p class="mb-2"><strong>Endurance:</strong> 95</p>
+			</div>
+		</div>
+	</div>
+}

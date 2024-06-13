@@ -95,7 +95,12 @@ func main() {
         return view.QuestPage(quest).Render(context.Background(), c.Response().Writer)
     })
 
+    e.GET("/skills", func(c echo.Context) error {
+        return view.Skills(player).Render(context.Background(), c.Response().Writer)
+    })
 
-
+    e.GET("/status", func(c echo.Context) error {
+        return view.Status(player).Render(context.Background(), c.Response().Writer)
+    })
 	e.Logger.Fatal(e.Start(":42069"))
 }

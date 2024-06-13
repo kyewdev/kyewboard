@@ -1,7 +1,6 @@
 package view
 
 import "kyewboard/pkg/db"
-import "strconv"
 
 templ HelloDiv(name string) {
 	<div class="flex flex-col justify-center items-center">
@@ -36,51 +35,11 @@ templ Navbar() {
 			<a href="#" class="text-white font-morpheus text-2xl font-bold">Kyewboard</a>
 			<div class="space-x-4">
 				<a href="#" class="text-gray-300 hover:text-white" hx-get="/home" hx-target="#content" hx-swap="outerHTML">Home</a>
-				<a href="/quests" class="text-gray-300 hover:text-white" hx-on="click" hx-get="/quests" hx-target="#content" hx-swap="outerHTML">Quests</a>
-				<a href="#" class="text-gray-300 hover:text-white" hx-get="/status" hx-target="#content" hx-swap="outerHTML">Player Status</a>
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/quests" hx-target="#content" hx-swap="outerHTML">Quests</a>
+				<a href="#" class="text-gray-300 hover:text-white" hx-get="/status" hx-target="#content" hx-swap="outerHTML">Status</a>
 				<a href="#" class="text-gray-300 hover:text-white" hx-get="/skills" hx-target="#content" hx-swap="outerHTML">Skills</a>
-				<a href="#" class="text-gray-300 hover:text-white" hx-get="/profile" hx-target="#content" hx-swap="outerHTML">Profile</a>
-				<a href="#" class="text-gray-300 hover:text-white" hx-get="/settings" hx-target="#content" hx-swap="outerHTML">Settings</a>
 			</div>
 		</div>
 	</nav>
 }
 
-templ Status(player db.Player) {
-	<div id="content" class="max-w-4xl absolute justify-center mx-auto p-6 mt-8">
-		<div class="bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg ">
-			<h2 class="text-2xl text-center font-bold font-morpheus text-[#daf6fc] mb-4">Status</h2>
-			<p class="mb-2"><strong>Name:</strong> { player.Name }</p>
-			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(player.Level) }</p>
-			<div class="bg-blue-400 bg-opacity-20 p-4 rounded-lg">
-				<p class="mb-2"><strong>Strength:</strong> 120</p>
-				<p class="mb-2"><strong>Agility:</strong> 110</p>
-				<p class="mb-2"><strong>Intelligence:</strong> 100</p>
-				<p class="mb-2"><strong>Endurance:</strong> 95</p>
-			</div>
-		</div>
-	</div>
-}
-
-templ Skills(player db.Player) {
-    <div id="content">
-		for _,v := range player.Skills {
-			@Skill(v)
-		}
-    </div>
-}
-
-templ Skill(skill db.Skill) {
-	<div class="max-w-2xl mx-auto p-6 mt-8">
-		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-20 rounded-lg shadow-md">
-			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{ skill.Title }</h2>
-			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(skill.Level) }</p>
-			<p class="mb-2"><strong>Experience:</strong> { strconv.Itoa(skill.Experience) }/500 XP</p>
-			<p class="mb-2"><strong>Category:</strong> { skill.Category }</p>
-			<div class="flex space-x-4">
-				<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit Skill</button>
-				<button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Skill</button>
-			</div>
-		</div>
-	</div>
-}
