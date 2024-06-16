@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"net/http"
+	// "net/http"
 
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/view"
@@ -66,20 +66,6 @@ func main() {
 	})
 
 
-    e.POST("/accepted", func(c echo.Context) error {
-        quest.Status = "Accepted"
-        completebtn := view.CompleteDiv()
-        return completebtn.Render(context.Background(),c.Response().Writer)
-
-    })
-
-
-    e.POST("/declined", func(c echo.Context) error {
-        quest.Status = "Declined"
-        return c.String(http.StatusOK, quest.Status)
-    })
-    
-
     e.POST("/completed", func(c echo.Context) error {
         return body.Render(context.Background(), c.Response().Writer)
     })
@@ -107,7 +93,6 @@ func main() {
     e.GET("/skills", func(c echo.Context) error {
         return view.Skills(player).Render(context.Background(), c.Response().Writer)
     })
-
 
     e.GET("/status", func(c echo.Context) error {
         return view.Status(player).Render(context.Background(), c.Response().Writer)

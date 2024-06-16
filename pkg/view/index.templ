@@ -27,7 +27,7 @@ templ Body(quest db.Quest, player db.Player) {
 templ Navbar() {
 	<nav class="bg-gray-800 p-4">
 		<div class="container mx-auto flex justify-between items-center">
-			<a href="#" class="text-white font-morpheus text-2xl font-bold">Kyewboard</a>
+			<a href="#" class="text-white font-morpheus text-[#daf6fc] text-2xl font-bold">Kyewboard</a>
 			<div class="space-x-4">
 				<a href="#" class="text-gray-300 hover:text-white" hx-get="/home" hx-target="#content" hx-swap="outerHTML">Home</a>
 				<a href="#" class="text-gray-300 hover:text-white" hx-get="/quests" hx-target="#content" hx-swap="outerHTML">Quests</a>
