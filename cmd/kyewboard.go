@@ -49,7 +49,12 @@ func main() {
     e.Use(middleware.Logger())
 
     rewards := []string{"+1000 GO Exp", "+1000 Html Exp"}
-    objectives := []string{"Setup GO Server", "Setup Templ", "Setup Air", "testing multiline long objecttive omg hi new line wtattat" }
+    objectives := []db.Objective{
+        db.Objective{Done: true, Text: "Setup GO Server"},
+        db.Objective{Text: "Setup Templ", Done: true},
+        db.Objective{Text: "Setup Air", Done: true},
+        db.Objective{Text: "testing multiline long objecttive omg hi new line wtattat", Done: false}, 
+    }
     quest := db.Quest{Id: 1, Message: "Kyewboard setup quest", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
     player := NewPlayer()
 	index := view.Index(quest, player)

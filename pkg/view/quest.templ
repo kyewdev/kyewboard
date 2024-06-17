@@ -48,9 +48,13 @@ templ Reward(reward string) {
 	</div>
 }
 
-templ Objective(objective string, index int) {
+templ Objective(objective db.Objective, index int) {
 	<div class="flex w-full relative">
-		@TaskLabel(objective)
+	    if objective.Done {
+            @TaskLabelLT(objective.Text)
+        } else {
+            @TaskLabel(objective.Text)
+        }
 		<input
 			id="taskcheckbox"
 			name="taskcheckbox"
@@ -62,7 +66,7 @@ templ Objective(objective string, index int) {
 			hx-trigger="change"
 			hx-target="previous #tasklabel"
 		/>
-        <input type="hidden" id={util.TasklblInput(index)} value={objective} name="tasklabel"/>
+        <input type="hidden" id={util.TasklblInput(index)} value={objective.Text} name="tasklabel"/>
 	</div>
 }
 

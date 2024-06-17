@@ -4,13 +4,17 @@ type Quest struct {
 	Id       int
 	Message  string
 	Status   string
-    Objectives []string
+    Objectives []Objective
 	Rewards   []string
 	Assignee string
     Questtype string
     Category string
 }
 
+type Objective struct {
+    Done bool
+    Text string
+}
 
 type Player struct {
     Name string
