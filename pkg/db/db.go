@@ -23,6 +23,7 @@ type Player struct {
     Experience int
     Skills map[string]Skill
     Stats map[string]int
+    Quests []Quest
 }
 
 type Skill struct {

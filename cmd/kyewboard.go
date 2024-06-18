@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewPlayer() db.Player {
+func NewPlayer(quests []db.Quest) db.Player {
     stats := map[string]int{
         "Vitality": 0,
         "Strength": 0,
@@ -40,6 +40,7 @@ func NewPlayer() db.Player {
         Level : 1,
         Id : 1,
         Name : "Kyew",
+        Quests: quests,
     }
 }
 
@@ -50,18 +51,27 @@ func main() {
 
     rewards := []string{"+1000 GO Exp", "+1000 Html Exp"}
     objectives := []db.Objective{
-        db.Objective{Done: true, Text: "Setup GO Server"},
-        db.Objective{Text: "Setup Templ", Done: true},
-        db.Objective{Text: "Setup Air", Done: true},
-        db.Objective{Text: "testing multiline long objecttive omg hi new line wtattat", Done: false}, 
+        {Done: true, Text: "Setup GO Server"},
+        {Text: "Setup Templ", Done: true},
+        {Text: "Setup Air", Done: true},
+        {Text: " PUT RL ON M2 ", Done: false}, 
     }
     quest := db.Quest{Id: 1, Message: "Kyewboard setup quest", Status: "Pending",Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
-    player := NewPlayer()
-	index := view.Index(quest, player)
-    body := view.Body(quest, player)
-	// quests := make([]Quest)
+    
+    rewards2 := []string{"+1000 DB Exp", "+1000 Docker Exp"}
+    objc := []db.Objective{
+        {Text: "INSTALL POSTGRE DB ", Done: false}, 
+        {Text: "INSTALL DOCKER DESKTOP", Done: false}, 
+    }
+    quest2 := db.Quest{Id: 2, Message: "PostgreSQL setup quest", Status: "Pending", Objectives: objc, Rewards: rewards2, Assignee: "kyew"}
+    
+    quests := []db.Quest{quest, quest2}
 
-	// quests := append(quests, quest)
+    player := NewPlayer(quests)
+
+    index := view.Index(quest, player)
+    body := view.Body(quest, player)
+
 	
 	e.Static("/static", "/assets")
 
@@ -79,6 +89,7 @@ func main() {
     e.POST("/toggletask", func(c echo.Context) error {
         checked := c.FormValue("taskcheckbox") == "on"
         objective := c.FormValue("tasklabel")
+        // NEED QEUST UND OBJECTIVE ID
 
         if checked {
             tasklbl := view.TaskLabelLT(objective)
@@ -91,7 +102,7 @@ func main() {
 
 
     e.GET("/quests", func(c echo.Context) error {
-        return view.QuestPage(quest).Render(context.Background(), c.Response().Writer)
+        return view.QuestPage(quests).Render(context.Background(), c.Response().Writer)
     })
 
 

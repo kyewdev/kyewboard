@@ -1,12 +1,15 @@
 package util
 
-import "strconv"
+import (
+	"strconv"
+
+)
 
 
-func TasklblInput(index int) string {
-    return "tasklblInput-" + strconv.Itoa(index)
+func TasklblInput(questindex int, objectiveindex int) string {
+    return "tasklblInput-" + strconv.Itoa(questindex) + "-" + strconv.Itoa(objectiveindex)
 }
 
-func TasklblInputHash(index int) string {
-    return "#tasklblInput-" + strconv.Itoa(index)
+func TasklblInputHash(questindex int, objectiveindex int) string {
+    return "#tasklblInput-" + strconv.Itoa(questindex) + "-" + strconv.Itoa(objectiveindex)
 }
