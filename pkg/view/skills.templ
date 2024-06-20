@@ -13,7 +13,7 @@ templ Skills(player db.Player) {
 
 templ Skill(skill db.Skill) {
 	<div class="max-w-2xl mx-auto p-6 mt-8">
-		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-20 rounded-lg shadow-md">
+		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-60 rounded-lg shadow-md">
 			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{ skill.Title }</h2>
 			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(skill.Level) }</p>
 			<p class="mb-2"><strong>Experience:</strong> { strconv.Itoa(skill.Experience) }/500 XP</p>

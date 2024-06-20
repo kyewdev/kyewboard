@@ -2,7 +2,6 @@ package view
 
 import "kyewboard/pkg/db"
 
-
 templ Index(quest db.Quest, player db.Player) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -18,9 +17,12 @@ templ Index(quest db.Quest, player db.Player) {
 }
 
 templ Body(quest db.Quest, player db.Player) {
-	<body class="bg-gray-900 text-white relative" id="body">
-		@Navbar()
-        @Status(player)
+	<body class="text-white relative min-h-screen flex flex-col" id="body">
+		<div class="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style="background-image: url('/static/Violet.jpg')"></div>
+		<div class="relative min-h-screen w-full bg-opacity-90 bg-gray-900 flex flex-col">
+			@Navbar()
+			@Status(player)
+		</div>
 	</body>
 }
 
@@ -37,4 +39,3 @@ templ Navbar() {
 		</div>
 	</nav>
 }
-

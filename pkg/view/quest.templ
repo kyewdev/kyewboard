@@ -13,8 +13,8 @@ templ MiniQuest() {
 
 templ QuestPage(quests []db.Quest) {
 	<div id="content" class="container mx-auto mt-4">
-		<div id="quests" class="container space-y-4">
-			<h2 class="text-2xl justify-center font-bold">Quests</h2>
+        <h2 class="text-2xl justify-center font-bold">Quests</h2>
+		<div id="quests" class="container  space-y-4">
 			for idx, quest:= range quests {
 				@Quest(quest, idx)
 			}
@@ -25,7 +25,7 @@ templ QuestPage(quests []db.Quest) {
 
 templ EditableQuest() {
 	<div class="max-w-2xl mx-auto p-6 mt-8">
-		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
+		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-60 p-6 rounded-lg inline-block shadow-md">
 			<div class="text-center mb-4 flex justify-center">
 				<input
 					id="editableTitle"
@@ -55,7 +55,7 @@ templ EditableQuest() {
 
 templ Quest(quest db.Quest, questidx int) {
 	<div class="max-w-2xl mx-auto p-6 mt-8">
-		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-20 p-6 rounded-lg inline-block shadow-md">
+		<div class="w-full bg-blue-900 border border-[#daf6fc] p-6 bg-opacity-60 rounded-lg inline-block shadow-md">
 			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
 			<div class="w-full flex flex-row space-x-4 justify-evenly">
 				<div class="w-2/3 container justify-evenly">
