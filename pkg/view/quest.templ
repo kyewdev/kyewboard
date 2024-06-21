@@ -1,7 +1,6 @@
 package view
 
 import "kyewboard/pkg/db"
-import "strconv"
 import "kyewboard/pkg/util"
 
 templ FullQuest() {
@@ -13,7 +12,7 @@ templ MiniQuest() {
 
 templ QuestPage(quests []db.Quest) {
 	<div id="content" class="container mx-auto mt-4">
-        <h2 class="text-2xl justify-center font-bold">Quests</h2>
+		<h2 class="text-2xl justify-center font-bold">Quests</h2>
 		<div id="quests" class="container  space-y-4">
 			for idx, quest:= range quests {
 				@Quest(quest, idx)
@@ -24,28 +23,29 @@ templ QuestPage(quests []db.Quest) {
 }
 
 templ EditableQuest() {
-	<div class="max-w-2xl mx-auto p-6 mt-8">
+	<div class="max-w-2xl mx-auto p-6 mt-8" id="editable-quest">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-60 p-6 rounded-lg inline-block shadow-md">
 			<div class="text-center mb-4 flex justify-center">
 				<input
-					id="editableTitle"
+					id="editable-title"
 					name="editableTitle"
 					type="text"
 					placeholder="TITLE"
-                    onfocus="this.placeholder = ''"
+					onfocus="this.placeholder = ''"
 					class="text-4xl text-center text-[#daf6fc] font-morpheus bg-blue-900 bg-transparent font-bold border-none border-[#daf6fc] focus:outline-none"
 				/>
 			</div>
 			<div class="w-full flex flex-row space-x-4 justify-evenly">
 				<div class="w-2/3 container justify-evenly">
 					<p class="text-left text-[#daf6fc] lock font-bold font-morpheus mb-2">Objectives:</p>
-                    @EditableObjective()
+					@EditableObjective()
 				</div>
 				<div class="w-1/3 container justify-evenly">
 					<p class="text-left  text-[#daf6fc] font-bold font-morpheus">Rewards:</p>
 					@EditableReward()
 				</div>
 			</div>
+			@AddQuestBtn()
 			// ADD QUEST
 			// DIFFICULTY
 			// CATEGORY
@@ -56,7 +56,7 @@ templ EditableQuest() {
 templ Quest(quest db.Quest, questidx int) {
 	<div class="max-w-2xl mx-auto p-6 mt-8">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] p-6 bg-opacity-60 rounded-lg inline-block shadow-md">
-			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">The Quest { strconv.Itoa(quest.Id) }</h1>
+			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">{ quest.Message }</h1>
 			<div class="w-full flex flex-row space-x-4 justify-evenly">
 				<div class="w-2/3 container justify-evenly">
 					<p class="text-left text-[#daf6fc] lock font-bold font-morpheus mb-2">Objectives:</p>
@@ -84,14 +84,14 @@ templ Reward(reward string) {
 }
 
 templ EditableReward() {
-	<div class="flex justify-between w-full relative">
-		<input id="editableReward" type="text" placeholder="New Reward" onfocus="this.placeholder = ''" class="w-full bg-transparent border-none border-[#daf6fc] ] focus:outline-none"/>
+	<div class="flex justify-between w-full relative" >
+		<input type="text" id="editable-reward" name="editableReward" placeholder="New Reward" onfocus="this.placeholder = ''" class="w-full bg-transparent border-none border-[#daf6fc] ] focus:outline-none"/>
 	</div>
 }
 
 templ EditableObjective() {
-	<div class="flex w-full relative">
-		<input id="editableObjective" type="text" placeholder="New Objective" onfocus="this.placeholder = ''" class="w-full bg-transparent border-none border-[#daf6fc] ] focus:outline-none"/>
+	<div class="flex w-full relative" >
+		<input id="editable-objective" name="editableObjective" type="text" placeholder="New Objective" onfocus="this.placeholder = ''" class="w-full bg-transparent border-none border-[#daf6fc] ] focus:outline-none"/>
 	</div>
 }
 
@@ -137,15 +137,22 @@ templ TaskLabelLT(objective string) {
 	<label id="tasklabel" class="flex-grow text-left line-through text-gray-500">{ objective }</label>
 }
 
-templ AcceptDiv() {
-	<div class="flex w-full mt-4" id="hi">
-		<button class="w-1/2 bg-green-200 hover:bg-green-300 text-black py-2" hx-post="/accepted" hx-trigger="click" hx-target="closest #hi" hx-swap="innerHTML">Accept</button>
-		<button class="w-1/2 bg-red-200 hover:bg-red-300 text-black py-2" hx-post="/declined" hx-trigger="click" hx-target="previous #status" hx-swap="innerHTML">Decline</button>
+templ AddQuestBtn() {
+	<div class="flex w-full mt-4 justify-center">
+		<button
+			class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg"
+			hx-post="/addquest"
+			hx-trigger="click"
+			hx-include="#editable-objective, #editable-title, #editable-reward"       
+			hx-target="#content"
+		>
+			Add Quest
+		</button>
 	</div>
 }
 
 templ CompleteDiv() {
 	<div class="flex w-full mt-4 justify-center">
-		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click" hx-target="#body">Complete Quest</button>
+		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click" hx-target="#content">Complete Quest</button>
 	</div>
 }
