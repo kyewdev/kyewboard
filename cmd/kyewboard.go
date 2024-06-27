@@ -37,7 +37,7 @@ func NewPlayer(quests []db.Quest) db.Player {
 		Skills:     skills,
 		Experience: 0,
 		Level:      1,
-		Id:         1,
+		ID:         1,
 		Name:       "Kyew",
 		Quests:     quests,
 	}
@@ -54,21 +54,21 @@ func main() {
 		{Text: "Setup Air", Done: true},
 		{Text: " PUT RL ON M2 ", Done: false},
 	}
-	quest := db.Quest{Id: 1, Message: "Kyewboard setup quest", Status: "Pending", Objectives: objc1, Rewards: rewards1, Assignee: "kyew"}
+	quest := db.Quest{ID: 1, Message: "Kyewboard setup quest", Status: "Pending", Objectives: objc1, Rewards: rewards1, Assignee: "kyew"}
 
 	rewards2 := []string{"+1000 DB Exp", "+1000 Docker Exp"}
 	objc2 := []db.Objective{
 		{Text: "INSTALL POSTGRE DB ", Done: false},
 		{Text: "INSTALL DOCKER DESKTOP", Done: false},
 	}
-	quest2 := db.Quest{Id: 2, Message: "PostgreSQL setup quest", Status: "Pending", Objectives: objc2, Rewards: rewards2, Assignee: "kyew"}
+	quest2 := db.Quest{ID: 2, Message: "PostgreSQL setup quest", Status: "Pending", Objectives: objc2, Rewards: rewards2, Assignee: "kyew"}
 
 	rewards3 := []string{"+1000 Game Dev. Exp", "+1000 C++ Exp"}
 	objc3 := []db.Objective{
 		{Done: false, Text: "Setup Project"},
 	}
 
-	quest3 := db.Quest{Id: 1, Message: "Kyewgame Setup Quest", Status: "Pending", Objectives: objc3, Rewards: rewards3, Assignee: "kyew"}
+	quest3 := db.Quest{ID: 3, Message: "Kyewgame Setup Quest", Status: "Pending", Objectives: objc3, Rewards: rewards3, Assignee: "kyew"}
 	quests := []db.Quest{quest, quest2, quest3}
 
 	player := NewPlayer(quests)
@@ -104,13 +104,13 @@ func main() {
 	e.POST("/addquest", func(c echo.Context) error {
 		// GET OBJEVTIVES AND REWARDS -> RETURN NEW QUEST PAGE WITH n + 1 quests
 		reward := c.FormValue("editableReward")
-        rewards := []string{reward,}
+		rewards := []string{reward}
 		objective := c.FormValue("editableObjective")
-        objectives := []db.Objective{
-            {Done: false, Text:objective },
-        }
+		objectives := []db.Objective{
+			{Done: false, Text: objective},
+		}
 		title := c.FormValue("editableTitle")
-		newQuest := db.Quest{Id: len(quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
+		newQuest := db.Quest{ID: len(quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
 		quests = append(quests, newQuest)
 		return view.QuestPage(quests).Render(context.Background(), c.Response().Writer)
 	})
