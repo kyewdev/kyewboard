@@ -6,7 +6,7 @@ import (
 )
 
 func Connect() (*gorm.DB, error) {
-	dsn := "host=localhost user=postgres password=kyewroot dbname=kyewboard port=8181 sslmode=disable TimeZone=Europe/Germany"
+	dsn := "host=localhost user=postgres password=kyewroot dbname=kyewboard port=8181 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -42,18 +42,19 @@ type Player struct {
 	Name       string
 	Level      int
 	Experience int
-	Skills     map[string]Skill `gorm:"-"`
-	Stats      map[string]int   `gorm:"-"`
-	Quests     []Quest          `gorm:"many2many:player_quests;"`
+	Skills     []Skill        `gorm:"foreignKey:PlayerID"`
+	Stats      map[string]int `gorm:"-"`
+	Quests     []Quest        `gorm:"many2many:player_quests;"`
 }
 
 type Skill struct {
-	ID         int `gorm:"primaryKey;autoIncrement"`
-	Category   string
-	Level      int
-	Experience int
-	Title      string
-	PlayerID   int `gorm:"index"`
+	ID          int `gorm:"primaryKey;autoIncrement"`
+	Category    string
+	Level       int
+	Experience  int
+	Title       string
+	Description string
+	PlayerID    int `gorm:"index"`
 }
 
 type PlayerQuest struct {
