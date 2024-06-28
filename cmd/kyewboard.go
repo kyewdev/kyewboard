@@ -3,31 +3,42 @@ package main
 import (
 	"context"
 	// "net/http"
-    "log"
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/view"
+	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"gorm.io/gorm"
 )
+func savePlayer(player db.Player, database *gorm.DB ) {
+    
+    result := database.Create(&player)
 
+    if result.Error != nil {
+        log.Fatalf("failed to save player: %v", result.Error)
+    } else {
+        log.Printf("PLAYER SAVED; AFFECTED ROWS: %v" , result.RowsAffected)
+    }
 
+}
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
-    
-    database, err :=db.Connect()
+
+	database, err := db.Connect()
 	if err != nil {
 		log.Fatalf("failed to connect to the database: %v", err)
 	}
 
-	if err :=db.Migrate(database); err != nil {
+	if err := db.Migrate(database); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 
+	player := PlayerWithQuests()
 
+    savePlayer(player, database)
 
-    player := PlayerWithQuests()
 	index := view.Index(player.Quests[0], player)
 
 	/////////////BASE //////////////////
@@ -112,9 +123,7 @@ func PlayerWithQuests() db.Player {
 
 	return NewPlayer(quests)
 
-  
 }
-
 
 func NewPlayer(quests []db.Quest) db.Player {
 	stats := map[string]int{
