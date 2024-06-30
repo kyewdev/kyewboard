@@ -4,14 +4,13 @@ import (
 	"context"
 	// "net/http"
 	"kyewboard/pkg/db"
+	"kyewboard/pkg/models"
 	"kyewboard/pkg/view"
-    "kyewboard/pkg/models"
 	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
-
 
 func main() {
 	e := echo.New()
@@ -22,18 +21,17 @@ func main() {
 		log.Fatalf("failed to connect to the database: %v", connErr)
 	}
 
-   // if migErr := db.Migrate(database); migErr != nil {
+	// if migErr := db.Migrate(database); migErr != nil {
 	//	log.Fatalf("failed to migrate database: %v", migErr)
 	//}
 
-    player, retrErr :=db.RetrievePlayer(database, 1)
+	player, retrErr := db.GetPlayerById(database, 1)
 
 	if retrErr != nil {
 		log.Fatalf("failed to connect to the database: %v", retrErr)
-    }	
+	}
 
-
-	index := view.Index( *player)
+	index := view.Index(*player)
 
 	/////////////BASE //////////////////
 	e.Static("/static", "/assets")
@@ -49,14 +47,21 @@ func main() {
 
 	e.POST("/toggletask", func(c echo.Context) error {
 		checked := c.FormValue("taskcheckbox") == "on"
-		objective := c.FormValue("tasklabel")
+		objectiveId := c.FormValue("tasklabel")
+		objective, err := db.GetObjectiveByID(database, objectiveId)
+
+		if err != nil {
+            log.Fatalf("Couldnt get Objective with Id: %s, %d",objectiveId, retrErr)
+		}
+        objective.Done = checked
+        db.SaveEntity(*objective, database) 
 		// NEED QEUST UND OBJECTIVE ID
 
 		if checked {
-			tasklbl := view.TaskLabelLT(objective)
+			tasklbl := view.TaskLabelLT(objective.Text)
 			return tasklbl.Render(context.Background(), c.Response().Writer)
 		} else {
-			tasklbl := view.TaskLabel(objective)
+			tasklbl := view.TaskLabel(objective.Text)
 			return tasklbl.Render(context.Background(), c.Response().Writer)
 		}
 	})
@@ -74,7 +79,7 @@ func main() {
 		title := c.FormValue("editableTitle")
 		newQuest := models.Quest{ID: len(player.Quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
 		player.Quests = append(player.Quests, newQuest)
-		db.SavePlayer(*player, database)
+		db.SaveEntity(*player, database)
 		return view.QuestPage(player.Quests).Render(context.Background(), c.Response().Writer)
 	})
 	//////////// PAGES /////////////////////////

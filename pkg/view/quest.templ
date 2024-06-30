@@ -2,9 +2,9 @@ package view
 
 import "kyewboard/pkg/util"
 import "kyewboard/pkg/models"
+import "strconv"
 
 templ FullQuest() {
-	<div>HI</div>
 }
 
 templ MiniQuest() {
@@ -12,7 +12,6 @@ templ MiniQuest() {
 
 templ QuestPage(quests []models.Quest) {
 	<div id="content" class="container mx-auto mt-4">
-		<h2 class="text-2xl justify-center font-bold">Quests</h2>
 		<div id="quests" class="container  space-y-4">
 			for idx, quest:= range quests {
 				@Quest(quest, idx)
@@ -125,7 +124,7 @@ templ Objective(objective models.Objective, objidx int, questidx int) {
 				hx-target="previous #tasklabel"
 			/>
 		}
-		<input type="hidden" id={ util.TasklblInput(questidx, objidx) } value={ objective.Text } name="tasklabel"/>
+		<input type="hidden" id={ util.TasklblInput(questidx, objidx) } value={ strconv.Itoa(objective.ID) } name="tasklabel"/>
 	</div>
 }
 
