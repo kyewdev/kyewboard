@@ -5,41 +5,35 @@ import (
 	// "net/http"
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/view"
+    "kyewboard/pkg/models"
 	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gorm.io/gorm"
 )
-func savePlayer(player db.Player, database *gorm.DB ) {
-    
-    result := database.Create(&player)
 
-    if result.Error != nil {
-        log.Fatalf("failed to save player: %v", result.Error)
-    } else {
-        log.Printf("PLAYER SAVED; AFFECTED ROWS: %v" , result.RowsAffected)
-    }
 
-}
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	database, err := db.Connect()
-	if err != nil {
-		log.Fatalf("failed to connect to the database: %v", err)
+	database, connErr := db.Connect()
+	if connErr != nil {
+		log.Fatalf("failed to connect to the database: %v", connErr)
 	}
 
-	if err := db.Migrate(database); err != nil {
-		log.Fatalf("failed to migrate database: %v", err)
-	}
+   // if migErr := db.Migrate(database); migErr != nil {
+	//	log.Fatalf("failed to migrate database: %v", migErr)
+	//}
 
-	player := PlayerWithQuests()
+    player, retrErr :=db.RetrievePlayer(database, 1)
 
-    savePlayer(player, database)
+	if retrErr != nil {
+		log.Fatalf("failed to connect to the database: %v", retrErr)
+    }	
 
-	index := view.Index(player.Quests[0], player)
+
+	index := view.Index( *player)
 
 	/////////////BASE //////////////////
 	e.Static("/static", "/assets")
@@ -70,14 +64,17 @@ func main() {
 	e.POST("/addquest", func(c echo.Context) error {
 		// GET OBJEVTIVES AND REWARDS -> RETURN NEW QUEST PAGE WITH n + 1 quests
 		reward := c.FormValue("editableReward")
-		rewards := []string{reward}
+		rewards := []models.Reward{{Text: reward}}
+
 		objective := c.FormValue("editableObjective")
-		objectives := []db.Objective{
+		objectives := []models.Objective{
 			{Done: false, Text: objective},
 		}
+
 		title := c.FormValue("editableTitle")
-		newQuest := db.Quest{ID: len(player.Quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
+		newQuest := models.Quest{ID: len(player.Quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
 		player.Quests = append(player.Quests, newQuest)
+		db.SavePlayer(*player, database)
 		return view.QuestPage(player.Quests).Render(context.Background(), c.Response().Writer)
 	})
 	//////////// PAGES /////////////////////////
@@ -86,46 +83,52 @@ func main() {
 	})
 
 	e.GET("/skills", func(c echo.Context) error {
-		return view.Skills(player).Render(context.Background(), c.Response().Writer)
+		return view.Skills(*player).Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/status", func(c echo.Context) error {
-		return view.Status(player).Render(context.Background(), c.Response().Writer)
+		return view.Status(*player).Render(context.Background(), c.Response().Writer)
 	})
 
 	e.Logger.Fatal(e.Start(":42069"))
 }
 
-func PlayerWithQuests() db.Player {
-	rewards1 := []string{"+1000 GO Exp", "+1000 Html Exp"}
-	objc1 := []db.Objective{
+func PlayerWithQuests() models.Player {
+	rewards1 := []models.Reward{
+		{Text: "+1000 GO Exp"},
+		{Text: "+1000 Html Exp"},
+	}
+	objc1 := []models.Objective{
 		{Done: true, Text: "Setup GO Server"},
 		{Text: "Setup Templ", Done: true},
 		{Text: "Setup Air", Done: true},
 		{Text: " PUT RL ON M2 ", Done: false},
 	}
-	quest := db.Quest{ID: 1, Message: "Kyewboard setup quest", Status: "Pending", Objectives: objc1, Rewards: rewards1, Assignee: "kyew"}
 
-	rewards2 := []string{"+1000 DB Exp", "+1000 Docker Exp"}
-	objc2 := []db.Objective{
+	quest := models.Quest{ID: 1, Message: "Kyewboard setup quest", Status: "Pending", Objectives: objc1, Rewards: rewards1, Assignee: "kyew"}
+
+	rewards2 := []models.Reward{{Text: "+1000 DB Exp"}, {Text: "+1000 Docker Exp"}}
+	objc2 := []models.Objective{
 		{Text: "INSTALL POSTGRE DB ", Done: false},
 		{Text: "INSTALL DOCKER DESKTOP", Done: false},
 	}
-	quest2 := db.Quest{ID: 2, Message: "PostgreSQL setup quest", Status: "Pending", Objectives: objc2, Rewards: rewards2, Assignee: "kyew"}
+	quest2 := models.Quest{ID: 2, Message: "PostgreSQL setup quest", Status: "Pending", Objectives: objc2, Rewards: rewards2, Assignee: "kyew"}
 
-	rewards3 := []string{"+1000 Game Dev. Exp", "+1000 C++ Exp"}
-	objc3 := []db.Objective{
+	rewards3 := []models.Reward{
+		{Text: "+1000 Game Dev. Exp"},
+		{Text: "+1000 C++ Exp"}}
+	objc3 := []models.Objective{
 		{Done: false, Text: "Setup Project"},
 	}
 
-	quest3 := db.Quest{ID: 3, Message: "Kyewgame Setup Quest", Status: "Pending", Objectives: objc3, Rewards: rewards3, Assignee: "kyew"}
-	quests := []db.Quest{quest, quest2, quest3}
+	quest3 := models.Quest{ID: 3, Message: "Kyewgame Setup Quest", Status: "Pending", Objectives: objc3, Rewards: rewards3, Assignee: "kyew"}
+	quests := []models.Quest{quest, quest2, quest3}
 
 	return NewPlayer(quests)
 
 }
 
-func NewPlayer(quests []db.Quest) db.Player {
+func NewPlayer(quests []models.Quest) models.Player {
 	stats := map[string]int{
 		"Vitality":    0,
 		"Strength":    0,
@@ -133,20 +136,20 @@ func NewPlayer(quests []db.Quest) db.Player {
 		"Sense":       0,
 		"Agility":     0,
 	}
-	dev := db.Skill{Title: "Development", Category: "IT", Level: 1, Experience: 1}
-	sec := db.Skill{Title: "IT Security", Category: "IT", Level: 1, Experience: 1}
-	skate := db.Skill{Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1}
-	garden := db.Skill{Title: "Gardening", Category: "Biology", Level: 1, Experience: 1}
-	rocketleauge := db.Skill{Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1}
+	dev := models.Skill{Title: "Development", Category: "IT", Level: 1, Experience: 1}
+	sec := models.Skill{Title: "IT Security", Category: "IT", Level: 1, Experience: 1}
+	skate := models.Skill{Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1}
+	garden := models.Skill{Title: "Gardening", Category: "Biology", Level: 1, Experience: 1}
+	rocketleauge := models.Skill{Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1}
 
-	skills := []db.Skill{
+	skills := []models.Skill{
 		dev,
 		sec,
 		skate,
 		garden,
 		rocketleauge,
 	}
-	return db.Player{
+	return models.Player{
 		Stats:      stats,
 		Skills:     skills,
 		Experience: 0,

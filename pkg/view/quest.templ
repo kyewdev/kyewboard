@@ -1,7 +1,7 @@
 package view
 
-import "kyewboard/pkg/db"
 import "kyewboard/pkg/util"
+import "kyewboard/pkg/models"
 
 templ FullQuest() {
 	<div>HI</div>
@@ -10,7 +10,7 @@ templ FullQuest() {
 templ MiniQuest() {
 }
 
-templ QuestPage(quests []db.Quest) {
+templ QuestPage(quests []models.Quest) {
 	<div id="content" class="container mx-auto mt-4">
 		<h2 class="text-2xl justify-center font-bold">Quests</h2>
 		<div id="quests" class="container  space-y-4">
@@ -53,7 +53,7 @@ templ EditableQuest() {
 	</div>
 }
 
-templ Quest(quest db.Quest, questidx int) {
+templ Quest(quest models.Quest, questidx int) {
 	<div class="max-w-2xl mx-auto p-6 mt-8">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] p-6 bg-opacity-60 rounded-lg inline-block shadow-md">
 			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">{ quest.Message }</h1>
@@ -67,7 +67,7 @@ templ Quest(quest db.Quest, questidx int) {
 				<div class="w-1/3 container justify-evenly">
 					<p class="text-left  text-[#daf6fc] font-bold font-morpheus">Rewards:</p>
 					for i := range quest.Rewards {
-						@Reward(quest.Rewards[i])
+						@Reward(quest.Rewards[i].Text)
 					}
 				</div>
 			</div>
@@ -95,7 +95,7 @@ templ EditableObjective() {
 	</div>
 }
 
-templ Objective(objective db.Objective, objidx int, questidx int) {
+templ Objective(objective models.Objective, objidx int, questidx int) {
 	<div class="flex w-full relative">
 		if objective.Done {
 			@TaskLabelLT(objective.Text)

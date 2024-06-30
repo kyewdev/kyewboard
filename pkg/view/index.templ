@@ -1,8 +1,8 @@
 package view
 
-import "kyewboard/pkg/db"
+import "kyewboard/pkg/models"
 
-templ Index(quest db.Quest, player db.Player) {
+templ Index(player models.Player) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -12,11 +12,11 @@ templ Index(quest db.Quest, player db.Player) {
 			<link href="/static/style.css" rel="stylesheet"/>
 			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		</head>
-		@Body(quest, player)
+		@Body(player)
 	</html>
 }
 
-templ Body(quest db.Quest, player db.Player) {
+templ Body(player models.Player) {
 	<body class="text-white relative min-h-screen flex flex-col" id="body">
 		<div class="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style="background-image: url('/static/Violet.jpg')"></div>
 		<div class="relative min-h-screen w-full bg-opacity-90 bg-gray-900 flex flex-col">

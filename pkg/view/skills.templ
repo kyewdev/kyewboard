@@ -1,9 +1,9 @@
 package view
 
-import "kyewboard/pkg/db"
+import "kyewboard/pkg/models"
 import "strconv"
 
-templ Skills(player db.Player) {
+templ Skills(player models.Player) {
     <div id="content">
 		for _,v := range player.Skills {
 			@Skill(v)
@@ -11,7 +11,7 @@ templ Skills(player db.Player) {
     </div>
 }
 
-templ Skill(skill db.Skill) {
+templ Skill(skill models.Skill) {
 	<div class="max-w-2xl mx-auto p-6 mt-8">
 		<div class="bg-blue-900 p-6 border border-[#daf6fc] bg-opacity-60 rounded-lg shadow-md">
 			<h2 class="text-xl font-morpheus text-[#daf6fc] text-center font-semibold">{ skill.Title }</h2>

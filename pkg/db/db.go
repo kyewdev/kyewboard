@@ -3,6 +3,8 @@ package db
 import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"kyewboard/pkg/models"
+	"log"
 )
 
 func Connect() (*gorm.DB, error) {
@@ -16,48 +18,25 @@ func Connect() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&Quest{}, &Objective{}, &Player{}, &Skill{}, &PlayerQuest{})
+	return db.AutoMigrate(&models.Quest{}, &models.Objective{}, &models.Reward{}, &models.Player{}, &models.Skill{}, &models.PlayerQuest{})
 }
 
-type Quest struct {
-	ID         int `gorm:"primaryKey;autoIncrement"`
-	Message    string
-	Status     string
-	Objectives []Objective `gorm:"foreignKey:QuestID"`
-	Rewards    []string    `gorm:"type:text[]"`
-	Assignee   string
-	Questtype  string
-	Category   string
+func SavePlayer(player models.Player, database *gorm.DB) {
+
+	result := database.Save(&player)
+
+	if result.Error != nil {
+		log.Fatalf("failed to save player: %v", result.Error)
+	} else {
+		log.Printf("PLAYER SAVED; AFFECTED ROWS: %v", result.RowsAffected)
+	}
+
 }
 
-type Objective struct {
-	ID      int `gorm:"primaryKey;autoIncrement"`
-	Done    bool
-	Text    string
-	QuestID int `gorm:"index"`
-}
-
-type Player struct {
-	ID         int `gorm:"primaryKey;autoIncrement"`
-	Name       string
-	Level      int
-	Experience int
-	Skills     []Skill        `gorm:"foreignKey:PlayerID"`
-	Stats      map[string]int `gorm:"-"`
-	Quests     []Quest        `gorm:"many2many:player_quests;"`
-}
-
-type Skill struct {
-	ID          int `gorm:"primaryKey;autoIncrement"`
-	Category    string
-	Level       int
-	Experience  int
-	Title       string
-	Description string
-	PlayerID    int `gorm:"index"`
-}
-
-type PlayerQuest struct {
-	PlayerID int `gorm:"primaryKey"`
-	QuestID  int `gorm:"primaryKey"`
+func RetrievePlayer(db *gorm.DB, playerID int) (*models.Player, error) {
+	var player models.Player
+	if err := db.Preload("Skills").Preload("Quests").Preload("Quests.Objectives").Preload("Quests.Rewards").First(&player, playerID).Error; err != nil {
+		return nil, err
+	}
+	return &player, nil
 }
