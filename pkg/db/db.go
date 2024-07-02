@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"kyewboard/pkg/models"
 	"log"
+    "fmt"
 )
 
 func Connect() (*gorm.DB, error) {
@@ -59,4 +60,19 @@ func GetRewardByID(database *gorm.DB, rewardID string) (*models.Reward, error) {
 		return nil, err
 	}
 	return &reward, nil
+}
+
+func DeletePlayerByID(db *gorm.DB, playerID int) error {
+	if err := db.Delete(&models.Player{}, playerID).Error; err != nil {
+		return fmt.Errorf("failed to delete player: %w", err)
+	}
+	return nil
+}
+
+
+func DeleteQuestByID(db *gorm.DB, questID int) error {
+	if err := db.Delete(&models.Quest{}, questID).Error; err != nil {
+		return fmt.Errorf("failed to delete player: %w", err)
+	}
+	return nil
 }
