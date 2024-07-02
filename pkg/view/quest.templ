@@ -1,8 +1,10 @@
 package view
 
-import "kyewboard/pkg/util"
-import "kyewboard/pkg/models"
-import "strconv"
+import (
+	"kyewboard/pkg/models"
+	"kyewboard/pkg/util"
+	"strconv"
+)
 
 templ FullQuest() {
 }
@@ -53,8 +55,16 @@ templ EditableQuest() {
 }
 
 templ Quest(quest models.Quest, questidx int) {
-	<div class="max-w-2xl mx-auto p-6 mt-8">
+	<div class="max-w-2xl mx-auto p-6 mt-8 relative">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] p-6 bg-opacity-60 rounded-lg inline-block shadow-md">
+			<div class="absolute top-2 right-2 flex space-x-2">
+				<button class="text-[#daf6fc] hover:text-[#fffa]">
+					<img src="/static/edit.png" alt="Edit" class="w-6 h-6"/>
+				</button>
+				<button class="text-[#daf6fc] hover:text-[#fffa]">
+					<img src="/static/delete2.png" alt="Delete" class="w-6 h-6"/>
+				</button>
+			</div>
 			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">{ quest.Message }</h1>
 			<div class="w-full flex flex-row space-x-4 justify-evenly">
 				<div class="w-2/3 container justify-evenly">
