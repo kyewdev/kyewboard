@@ -3,8 +3,10 @@ module kyewboard
 go 1.22.1
 
 require (
-	github.com/a-h/templ v0.2.680
+	github.com/a-h/templ v0.2.731
 	github.com/labstack/echo/v4 v4.12.0
+	gorm.io/driver/postgres v1.5.9
+	gorm.io/gorm v1.25.10
 )
 
 require (
@@ -26,6 +28,4 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	gorm.io/driver/postgres v1.5.9 // indirect
-	gorm.io/gorm v1.25.10 // indirect
 )

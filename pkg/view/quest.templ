@@ -57,13 +57,9 @@ templ EditableQuest() {
 templ Quest(quest models.Quest, questidx int) {
 	<div class="max-w-2xl mx-auto p-6 mt-8 relative">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] p-6 bg-opacity-60 rounded-lg inline-block shadow-md">
-			<div class="absolute top-2 right-2 flex space-x-2">
-				<button class="text-[#daf6fc] hover:text-[#fffa]">
-					<img src="/static/edit.png" alt="Edit" class="w-6 h-6"/>
-				</button>
-				<button class="text-[#daf6fc] hover:text-[#fffa]">
-					<img src="/static/delete2.png" alt="Delete" class="w-6 h-6"/>
-				</button>
+			<div class="absolute top-10 right-10 flex space-x-2">
+				@EditBtn(quest)
+                @DeleteBtn(quest)
 			</div>
 			<h1 class="text-center text-4xl text-[#daf6fc]  font-morpheus font-bold mb-4">{ quest.Message }</h1>
 			<div class="w-full flex flex-row space-x-4 justify-evenly">
@@ -94,13 +90,27 @@ templ Reward(reward string) {
 
 templ EditableReward() {
 	<div class="flex justify-between w-full relative">
-		<input type="text" id="editable-reward" name="editableReward" placeholder="New Reward" onfocus="this.placeholder = ''" class="w-full bg-transparent border-none border-[#daf6fc] ] focus:outline-none"/>
+		<input
+			type="text"
+			id="editable-reward"
+			name="editableReward"
+			placeholder="New Reward"
+			onfocus="this.placeholder = ''"
+			class="w-full bg-transparent border-none border-[#daf6fc]  focus:outline-none"
+		/>
 	</div>
 }
 
 templ EditableObjective() {
 	<div class="flex w-full relative">
-		<input id="editable-objective" name="editableObjective" type="text" placeholder="New Objective" onfocus="this.placeholder = ''" class="w-full bg-transparent border-none border-[#daf6fc] ] focus:outline-none"/>
+		<input
+			id="editable-objective"
+			name="editableObjective"
+			type="text"
+			placeholder="New Objective"
+			onfocus="this.placeholder = ''"
+			class="w-full bg-transparent border-none border-[#daf6fc]  focus:outline-none"
+		/>
 	</div>
 }
 
@@ -113,7 +123,7 @@ templ Objective(objective models.Objective, objidx int, questidx int) {
 				name="taskcheckbox"
 				type="checkbox"
 				class="h-4 w-4 text-blue-600"
-				hx-post="/toggletask"
+				hx-post="/quests/toggletask"
 				hx-swap="outerHTML"
 				hx-include={ util.TasklblInputHash(questidx, objidx) }
 				hx-trigger="change"
@@ -127,7 +137,7 @@ templ Objective(objective models.Objective, objidx int, questidx int) {
 				name="taskcheckbox"
 				type="checkbox"
 				class="h-4 w-4 text-blue-600"
-				hx-post="/toggletask"
+				hx-post="/quests/toggletask"
 				hx-swap="outerHTML"
 				hx-include={ util.TasklblInputHash(questidx, objidx) }
 				hx-trigger="change"
@@ -150,7 +160,7 @@ templ AddQuestBtn() {
 	<div class="flex w-full mt-4 justify-center">
 		<button
 			class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg"
-			hx-post="/addquest"
+			hx-post="/quests/add"
 			hx-trigger="click"
 			hx-include="#editable-objective, #editable-title, #editable-reward"
 			hx-target="#content"
@@ -162,22 +172,38 @@ templ AddQuestBtn() {
 
 templ CompleteDiv() {
 	<div class="flex w-full mt-4 justify-center">
-		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/completed" hx-trigger="click" hx-target="#content">Complete Quest</button>
+		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/quests/complete" hx-trigger="click" hx-target="#content">Complete Quest</button>
 	</div>
 }
 
-templ EditBtn() {
-	<button class="text-[#daf6fc] hover:text-[#a1e0f5]" hx-get="/edit/{quest.ID}">
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l3 3m4-6l2 2m2 6.828A2.996 2.996 0 0115.172 18H8.828A2.996 2.996 0 016 15.172V8.828A2.996 2.996 0 018.828 6h6.344A2.996 2.996 0 0118 8.828V12z"></path>
-		</svg>
-	</button>
+templ EditBtn(quest models.Quest) {
+	<form
+		class="hover:opacity-40"
+		hx-post="/quests/edit"
+		hx-trigger="click"
+		hx-include="closest form"
+		hx-target="#content"
+        class="inline"
+	>
+		<button class="hover:opacity-40">
+            <img src="/static/edit.png" alt="Edit" class="w-6 h-6"/>
+		</button>
+		<input type="hidden" value={ strconv.Itoa(quest.ID) } name="questId"/>
+	</form>
 }
 
-templ DeleteBtn() {
-	<button class="text-[#daf6fc] hover:text-[#a1e0f5]" hx-delete="/delete/{quest.ID}">
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-		</svg>
-	</button>
+templ DeleteBtn(quest models.Quest) {
+	<form
+		class="hover:opacity-40"
+		hx-delete="/quests/delete"
+		hx-trigger="click"
+		hx-include="closest form"
+		hx-target="#content"
+        class="inline"
+	>
+		<button class="hover:opacity-40">
+			<img src="/static/delete2.png" alt="Delete" class="w-6 h-6"/>
+		</button>
+        <input type="hidden" name="questId" value={ strconv.Itoa(quest.ID) } />
+	</form>
 }

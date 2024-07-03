@@ -1,6 +1,4 @@
 package models
-import(
-)
 
 
 type Quest struct {
@@ -39,6 +37,14 @@ type Player struct {
 	Quests     []Quest        `gorm:"many2many:player_quests;"`
 }
 
+func (p *Player) RemoveQuestByID(questID int) {
+	for i, quest := range p.Quests {
+		if quest.ID == questID {
+			p.Quests = append(p.Quests[:i], p.Quests[i+1:]...)
+			break
+		}
+	}
+}
 type Skill struct {
 	ID          int `gorm:"primaryKey;autoIncrement"`
 	Category    string

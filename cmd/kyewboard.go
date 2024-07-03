@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	// "net/http"
+	"fmt"
+    "strconv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/models"
 	"kyewboard/pkg/view"
 	"log"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"net/http"
 )
 
 func main() {
@@ -25,13 +26,13 @@ func main() {
 	//	log.Fatalf("failed to migrate database: %v", migErr)
 	//}
 
-	player, retrErr := db.GetPlayerById(database, 1)
+	playermodel, retrErr := db.GetPlayerById(database, 1)
 
 	if retrErr != nil {
 		log.Fatalf("failed to connect to the database: %v", retrErr)
 	}
 
-	index := view.Index(*player)
+	index := view.Index(*playermodel)
 
 	/////////////BASE //////////////////
 	e.Static("/static", "/assets")
@@ -41,20 +42,20 @@ func main() {
 	})
 
 	////////////////QUEST /////////////////////////
-	e.POST("/completed", func(c echo.Context) error {
-		return view.QuestPage(player.Quests).Render(context.Background(), c.Response().Writer)
+	e.POST("/quests/complete", func(c echo.Context) error {
+		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
 	})
 
-	e.POST("/toggletask", func(c echo.Context) error {
+	e.POST("/quests/toggletask", func(c echo.Context) error {
 		checked := c.FormValue("taskcheckbox") == "on"
 		objectiveId := c.FormValue("tasklabel")
 		objective, err := db.GetObjectiveByID(database, objectiveId)
 
 		if err != nil {
-            log.Fatalf("Couldnt get Objective with Id: %s, %d",objectiveId, retrErr)
+			log.Fatalf("Couldnt get Objective with Id: %s, %d", objectiveId, retrErr)
 		}
-        objective.Done = checked
-        db.SaveEntity(*objective, database) 
+		objective.Done = checked
+		db.SaveEntity(*objective, database)
 		// NEED QEUST UND OBJECTIVE ID
 
 		if checked {
@@ -66,7 +67,19 @@ func main() {
 		}
 	})
 
-	e.POST("/addquest", func(c echo.Context) error {
+	e.DELETE("/quests/delete", func(c echo.Context) error {
+		questId := c.FormValue("questId")
+		questIdint, err := strconv.Atoi(questId)
+		if err != nil {
+			// Handle the error if the conversion fails
+			return c.String(http.StatusBadRequest, fmt.Sprintf("Invalid quest_id: %v", err))
+		}
+        log.Printf("WOUD DELETE QUEST: %d", questIdint)
+		playermodel.RemoveQuestByID(questIdint)
+		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
+	})
+
+	e.POST("/quests/add", func(c echo.Context) error {
 		// GET OBJEVTIVES AND REWARDS -> RETURN NEW QUEST PAGE WITH n + 1 quests
 		reward := c.FormValue("editableReward")
 		rewards := []models.Reward{{Text: reward}}
@@ -77,22 +90,22 @@ func main() {
 		}
 
 		title := c.FormValue("editableTitle")
-		newQuest := models.Quest{ID: len(player.Quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
-		player.Quests = append(player.Quests, newQuest)
-		db.SaveEntity(*player, database)
-		return view.QuestPage(player.Quests).Render(context.Background(), c.Response().Writer)
+		newQuest := models.Quest{ID: len(playermodel.Quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
+		playermodel.Quests = append(playermodel.Quests, newQuest)
+		db.SaveEntity(*playermodel, database)
+		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
 	})
 	//////////// PAGES /////////////////////////
 	e.GET("/quests", func(c echo.Context) error {
-		return view.QuestPage(player.Quests).Render(context.Background(), c.Response().Writer)
+		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/skills", func(c echo.Context) error {
-		return view.Skills(*player).Render(context.Background(), c.Response().Writer)
+		return view.Skills(*playermodel).Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/status", func(c echo.Context) error {
-		return view.Status(*player).Render(context.Background(), c.Response().Writer)
+		return view.Status(*playermodel).Render(context.Background(), c.Response().Writer)
 	})
 
 	e.Logger.Fatal(e.Start(":42069"))
