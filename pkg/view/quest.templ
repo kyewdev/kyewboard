@@ -181,9 +181,8 @@ templ EditBtn(quest models.Quest) {
 		class="hover:opacity-40"
 		hx-post="/quests/edit"
 		hx-trigger="click"
-		hx-include="closest form"
+		hx-include="this"
 		hx-target="#content"
-        class="inline"
 	>
 		<button class="hover:opacity-40">
             <img src="/static/edit.png" alt="Edit" class="w-6 h-6"/>
@@ -197,13 +196,12 @@ templ DeleteBtn(quest models.Quest) {
 		class="hover:opacity-40"
 		hx-delete="/quests/delete"
 		hx-trigger="click"
-		hx-include="closest form"
+		hx-include="find #delete_quest-id"
 		hx-target="#content"
-        class="inline"
 	>
 		<button class="hover:opacity-40">
 			<img src="/static/delete2.png" alt="Delete" class="w-6 h-6"/>
 		</button>
-        <input type="hidden" name="questId" value={ strconv.Itoa(quest.ID) } />
+        <input type="hidden" name="questId" id="delete_quest-id" value={ strconv.Itoa(quest.ID) } />
 	</form>
 }
