@@ -71,7 +71,6 @@ func main() {
 		questId := c.FormValue("questId")
 		questIdint, err := strconv.Atoi(questId)
 		if err != nil {
-			// Handle the error if the conversion fails
 			return c.String(http.StatusBadRequest, fmt.Sprintf("Invalid quest_id: %v", err))
 		}
         log.Printf("WOUD DELETE QUEST: %d", questIdint)

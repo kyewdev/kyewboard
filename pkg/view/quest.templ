@@ -2,7 +2,6 @@ package view
 
 import (
 	"kyewboard/pkg/models"
-	"kyewboard/pkg/util"
 	"strconv"
 )
 
@@ -125,7 +124,7 @@ templ Objective(objective models.Objective, objidx int, questidx int) {
 				class="h-4 w-4 text-blue-600"
 				hx-post="/quests/toggletask"
 				hx-swap="outerHTML"
-				hx-include={ util.TasklblInputHash(questidx, objidx) }
+				hx-include="next #objective-checkbox"
 				hx-trigger="change"
 				hx-target="previous #tasklabel"
 				checked
@@ -139,12 +138,12 @@ templ Objective(objective models.Objective, objidx int, questidx int) {
 				class="h-4 w-4 text-blue-600"
 				hx-post="/quests/toggletask"
 				hx-swap="outerHTML"
-				hx-include={ util.TasklblInputHash(questidx, objidx) }
+				hx-include="next #objective-checkbox"
 				hx-trigger="change"
 				hx-target="previous #tasklabel"
 			/>
 		}
-		<input type="hidden" id={ util.TasklblInput(questidx, objidx) } value={ strconv.Itoa(objective.ID) } name="tasklabel"/>
+		<input type="hidden" id="objective-checkbox" value={ strconv.Itoa(objective.ID) } name="tasklabel"/>
 	</div>
 }
 
