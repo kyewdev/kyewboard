@@ -88,7 +88,7 @@ templ Reward(reward string) {
 }
 
 templ EditableReward() {
-	<div class="flex justify-between w-full relative">
+	<div id="editable-reward-div" class="flex justify-between w-full relative">
 		<input
 			type="text"
 			id="editable-reward"
@@ -96,12 +96,16 @@ templ EditableReward() {
 			placeholder="New Reward"
 			onfocus="this.placeholder = ''"
 			class="w-full bg-transparent border-none border-[#daf6fc]  focus:outline-none"
+            hx-trigger="keyup[key=='Enter']"
+            hx-get="/quests/getEditableReward"
+            hx-swap="afterend"
+            hx-target="closest #editable-reward-div"
 		/>
 	</div>
 }
 
 templ EditableObjective() {
-	<div class="flex w-full relative">
+	<div id="editable-objective-div" class="flex w-full relative">
 		<input
 			id="editable-objective"
 			name="editableObjective"
@@ -109,6 +113,10 @@ templ EditableObjective() {
 			placeholder="New Objective"
 			onfocus="this.placeholder = ''"
 			class="w-full bg-transparent border-none border-[#daf6fc]  focus:outline-none"
+            hx-trigger="keyup[key=='Enter']"
+            hx-get="/quests/getEditableObjective"
+            hx-swap="afterend"
+            hx-target="closest #editable-objective-div"
 		/>
 	</div>
 }
