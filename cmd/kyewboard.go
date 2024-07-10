@@ -43,6 +43,11 @@ func main() {
 
 	////////////////QUEST /////////////////////////
 	e.POST("/quests/complete", func(c echo.Context) error {
+		questId := c.FormValue("questId")
+        quest := playermodel.GetQuestById(questId)
+        if quest == nil {
+            return c.NoContent(http.StatusBadRequest)
+        }
 		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
 	})
 

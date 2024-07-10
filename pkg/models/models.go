@@ -1,5 +1,7 @@
 package models
 
+import "strconv"
+
 
 type Quest struct {
 	ID         int `gorm:"primaryKey;autoIncrement"`
@@ -35,6 +37,16 @@ type Player struct {
 	Skills     []Skill        `gorm:"foreignKey:PlayerID"`
 	Stats      map[string]int `gorm:"-"`
 	Quests     []Quest        `gorm:"many2many:player_quests;"`
+}
+
+func (p *Player) GetQuestById(questId string) (*Quest) {
+    
+	for _, quest := range p.Quests {
+		if strconv.Itoa(quest.ID)== questId {
+            return &quest 	
+		}
+	}
+    return nil
 }
 
 func (p *Player) RemoveQuestByID(questID int) {

@@ -76,7 +76,7 @@ templ Quest(quest models.Quest, questidx int) {
 				</div>
 			</div>
 			<p class="text-left mb-2" id="status">Status: { quest.Status }</p>
-			@CompleteDiv()
+			@CompleteBtn()
 		</div>
 	</div>
 }
@@ -169,7 +169,7 @@ templ AddQuestBtn() {
 	</div>
 }
 
-templ CompleteDiv() {
+templ CompleteBtn() {
 	<div class="flex w-full mt-4 justify-center">
 		<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg" hx-post="/quests/complete" hx-trigger="click" hx-target="#content">Complete Quest</button>
 	</div>
