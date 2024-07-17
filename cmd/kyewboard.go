@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"kyewboard/pkg/controller"
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/models"
 	"kyewboard/pkg/view"
 	"log"
-	"net/http"
-	"strconv"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -22,9 +21,9 @@ func main() {
 		log.Fatalf("failed to connect to the database: %v", connErr)
 	}
 
-	// if migErr := db.Migrate(database); migErr != nil {
-	//	log.Fatalf("failed to migrate database: %v", migErr)
-	//}
+	if migErr := db.Migrate(database); migErr != nil {
+		log.Fatalf("failed to migrate database: %v", migErr)
+	}
 
 	playermodel, retrErr := db.GetPlayerById(database, 1)
 
@@ -32,6 +31,8 @@ func main() {
 		log.Fatalf("failed to connect to the database: %v", retrErr)
 	}
 
+	qc := controller.NewQuestController(database, playermodel)
+	qc.RegisterRoutes(e)
 	index := view.Index(*playermodel)
 
 	/////////////BASE //////////////////
@@ -41,110 +42,6 @@ func main() {
 		return index.Render(context.Background(), c.Response().Writer)
 	})
 
-	////////////////QUEST /////////////////////////
-	e.POST("/quests/complete", func(c echo.Context) error {
-		questId := c.FormValue("questId")
-		quest := playermodel.GetQuestById(questId)
-		if quest == nil {
-			return c.NoContent(http.StatusBadRequest)
-		}
-		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
-	})
-
-	e.POST("/quests/toggletask", func(c echo.Context) error {
-		checked := c.FormValue("taskcheckbox") == "on"
-		objectiveId := c.FormValue("tasklabel")
-		objective, err := db.GetObjectiveByID(database, objectiveId)
-
-		if err != nil {
-			log.Fatalf("Couldnt get Objective with Id: %s, %d", objectiveId, retrErr)
-		}
-		objective.Done = checked
-		db.SaveEntity(*objective, database)
-		// NEED QEUST UND OBJECTIVE ID
-
-		if checked {
-			tasklbl := view.TaskLabelLT(objective.Text)
-			return tasklbl.Render(context.Background(), c.Response().Writer)
-		} else {
-			tasklbl := view.TaskLabel(objective.Text)
-			return tasklbl.Render(context.Background(), c.Response().Writer)
-		}
-	})
-
-	e.GET("/quests/getEditableReward", func(c echo.Context) error {
-		return view.EditableReward().Render(context.Background(), c.Response().Writer)
-
-	})
-
-	e.GET("/quests/getEditableObjective", func(c echo.Context) error {
-		return view.EditableObjective().Render(context.Background(), c.Response().Writer)
-
-	})
-
-	e.DELETE("/quests/delete", func(c echo.Context) error {
-		questId := c.FormValue("questId")
-		questIdint, err := strconv.Atoi(questId)
-		if err != nil {
-			return c.String(http.StatusBadRequest, fmt.Sprintf("Invalid quest_id: %v", err))
-		}
-		log.Printf("WOUD DELETE QUEST: %d", questIdint)
-		playermodel.RemoveQuestByID(questIdint)
-        db.SaveEntity(*playermodel, database)
-
-		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
-	})
-
-	e.POST("/quests/add", func(c echo.Context) error {
-		// GET OBJEVTIVES AND REWARDS -> RETURN NEW QUEST PAGE WITH n + 1 quests
-		// Parse the form values
-		if err := c.Request().ParseForm(); err != nil {
-			return c.String(http.StatusBadRequest, "Failed to parse form data")
-		}
-
-		rewardStrings := c.Request().Form["editableReward"]
-		if len(rewardStrings) == 0 {
-			return c.NoContent(http.StatusNoContent)
-		}
-
-
-		rewards := []models.Reward{}
-		for _, r := range rewardStrings {
-            if r != "" { // Skip empty objectives
-                reward := models.Reward{
-                    Text: r,
-                }
-                rewards = append(rewards, reward)
-            }
-		}
-        
-        objectiveStrings := c.Request().Form["editableObjective"]
-
-
-		if len(objectiveStrings) == 0 {
-			return c.NoContent(http.StatusNoContent)
-		}
-
-        objectives := []models.Objective{}
-		for _, obj := range objectiveStrings {
-            if obj != "" { // Skip empty objectives
-                objective := models.Objective{
-                    Text: obj,
-                    Done: false,
-                }
-                objectives = append(objectives, objective)
-            }
-		}
-
-		title := c.FormValue("editableTitle")
-
-		newQuest := models.Quest{ID: len(playermodel.Quests) + 1, Message: title, Status: "Pending", Objectives: objectives, Rewards: rewards, Assignee: "kyew"}
-		playermodel.Quests = append(playermodel.Quests, newQuest)
-		db.SaveEntity(*playermodel, database)
-
-
-		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
-	})
 	//////////// PAGES /////////////////////////
 	e.GET("/quests", func(c echo.Context) error {
 		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)

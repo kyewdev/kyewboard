@@ -7,11 +7,16 @@ type Quest struct {
 	ID         int `gorm:"primaryKey;autoIncrement"`
 	Message    string
 	Status     string
-	Objectives []Objective `gorm:"foreignKey:QuestID"`
-	Rewards    []Reward    `gorm:"foreignKey:QuestID"`
+	Objectives []Objective `gorm:"foreignKey:QuestID;constraint:OnDelete:CASCADE;"`
+	Rewards    []Reward    `gorm:"foreignKey:QuestID;constraint:OnDelete:CASCADE;"`
 	Assignee   string
 	Questtype  string
 	Category   string
+}
+
+func (p *Player) CompleteQuest(q *Quest) {
+    // for _, reward := range q.Rewards {
+        
 }
 
 type Reward struct {
