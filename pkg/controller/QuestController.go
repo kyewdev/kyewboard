@@ -79,12 +79,17 @@ func (qc *QuestController) DeleteQuest(c echo.Context) error {
 		return c.String(http.StatusBadRequest, fmt.Sprintf("Invalid quest_id: %v", err))
 	}
 	log.Printf("WOULD DELETE QUEST: %d", questIdint)
-    db.DeleteQuestByID(qc.Database, questIdint)
 	qc.PlayerModel.RemoveQuestByID(questIdint)
-	db.SaveEntity(*qc.PlayerModel, qc.Database)
-
+    for _, q := range qc.PlayerModel.Quests {
+        log.Printf(q.Message)
+    }
+    db.DeleteQuestByID(qc.Database, questIdint) 
+//	db.SaveEntity(*qc.PlayerModel, qc.Database)
+    
 	return view.QuestPage(qc.PlayerModel.Quests).Render(context.Background(), c.Response().Writer)
 }
+
+
 
 func (qc *QuestController) AddQuest(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {

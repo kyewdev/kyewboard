@@ -1,16 +1,20 @@
 package db
 
 import (
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"fmt"
 	"kyewboard/pkg/models"
 	"log"
-    "fmt"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func Connect() (*gorm.DB, error) {
 	dsn := "host=localhost user=postgres password=kyewroot dbname=kyewboard port=8181 sslmode=disable"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+        Logger: logger.Default.LogMode(logger.Info),
+    })
 
 	if err != nil {
 		return nil, err
@@ -22,7 +26,7 @@ func Migrate(db *gorm.DB) error {
 	return db.AutoMigrate(&models.Quest{}, &models.Objective{}, &models.Reward{}, &models.Player{}, &models.Skill{}, &models.PlayerQuest{})
 }
 
-func SaveEntity(entity interface{}, database *gorm.DB) {
+func SaveEntity(entity interface{}, database *gorm.DB) (error) {
 	result := database.Save(entity)
 
 	if result.Error != nil {
@@ -30,6 +34,7 @@ func SaveEntity(entity interface{}, database *gorm.DB) {
 	} else {
 		log.Printf("ENTITY SAVED; AFFECTED ROWS: %v", result.RowsAffected)
 	}
+    return result.Error
 }
 func GetPlayerById(db *gorm.DB, playerID int) (*models.Player, error) {
 	var player models.Player

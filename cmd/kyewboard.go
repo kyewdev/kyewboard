@@ -24,13 +24,21 @@ func main() {
 	if migErr := db.Migrate(database); migErr != nil {
 		log.Fatalf("failed to migrate database: %v", migErr)
 	}
+    
 
 	playermodel, retrErr := db.GetPlayerById(database, 1)
-
+    
 	if retrErr != nil {
 		log.Fatalf("failed to connect to the database: %v", retrErr)
+        playermodel := NewPlayer()    
+        db.SaveEntity(&playermodel, database)
+        skills := NewSkillsForPlayer(1)
+        quests := NewQuestsForPlayer(1)
+        playermodel.Skills = skills
+        playermodel.Quests = quests
+        db.SaveEntity(&playermodel, database)
+        log.Print("setup skills and quests")
 	}
-
 	qc := controller.NewQuestController(database, playermodel)
 	qc.RegisterRoutes(e)
 	index := view.Index(*playermodel)
@@ -58,42 +66,8 @@ func main() {
 	e.Logger.Fatal(e.Start(":42069"))
 }
 
-func PlayerWithQuests() models.Player {
-	rewards1 := []models.Reward{
-		{Text: "+1000 GO Exp"},
-		{Text: "+1000 Html Exp"},
-	}
-	objc1 := []models.Objective{
-		{Done: true, Text: "Setup GO Server"},
-		{Text: "Setup Templ", Done: true},
-		{Text: "Setup Air", Done: true},
-		{Text: " PUT RL ON M2 ", Done: false},
-	}
 
-	quest := models.Quest{ID: 1, Message: "Kyewboard setup quest", Status: "Pending", Objectives: objc1, Rewards: rewards1, Assignee: "kyew"}
-
-	rewards2 := []models.Reward{{Text: "+1000 DB Exp"}, {Text: "+1000 Docker Exp"}}
-	objc2 := []models.Objective{
-		{Text: "INSTALL POSTGRE DB ", Done: false},
-		{Text: "INSTALL DOCKER DESKTOP", Done: false},
-	}
-	quest2 := models.Quest{ID: 2, Message: "PostgreSQL setup quest", Status: "Pending", Objectives: objc2, Rewards: rewards2, Assignee: "kyew"}
-
-	rewards3 := []models.Reward{
-		{Text: "+1000 Game Dev. Exp"},
-		{Text: "+1000 C++ Exp"}}
-	objc3 := []models.Objective{
-		{Done: false, Text: "Setup Project"},
-	}
-
-	quest3 := models.Quest{ID: 3, Message: "Kyewgame Setup Quest", Status: "Pending", Objectives: objc3, Rewards: rewards3, Assignee: "kyew"}
-	quests := []models.Quest{quest, quest2, quest3}
-
-	return NewPlayer(quests)
-
-}
-
-func NewPlayer(quests []models.Quest) models.Player {
+func NewPlayer() models.Player {
 	stats := map[string]int{
 		"Vitality":    0,
 		"Strength":    0,
@@ -101,26 +75,67 @@ func NewPlayer(quests []models.Quest) models.Player {
 		"Sense":       0,
 		"Agility":     0,
 	}
-	dev := models.Skill{Title: "Development", Category: "IT", Level: 1, Experience: 1}
-	sec := models.Skill{Title: "IT Security", Category: "IT", Level: 1, Experience: 1}
-	skate := models.Skill{Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1}
-	garden := models.Skill{Title: "Gardening", Category: "Biology", Level: 1, Experience: 1}
-	rocketleauge := models.Skill{Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1}
-
-	skills := []models.Skill{
-		dev,
-		sec,
-		skate,
-		garden,
-		rocketleauge,
-	}
 	return models.Player{
 		Stats:      stats,
-		Skills:     skills,
 		Experience: 0,
 		Level:      1,
 		ID:         1,
 		Name:       "Kyew",
-		Quests:     quests,
+	}
+}
+
+
+func NewSkillsForPlayer(playerID int) []models.Skill {
+	return []models.Skill{
+		{Title: "Development", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
+		{Title: "IT Security", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
+		{Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1, PlayerID: playerID},
+		{Title: "Gardening", Category: "Biology", Level: 1, Experience: 1, PlayerID: playerID},
+		{Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1, PlayerID: playerID},
+	}
+}
+
+func NewQuestsForPlayer(playerID int) []models.Quest {
+	return []models.Quest{
+		{
+			Message:  "Kyewboard setup quest",
+			Status:   "Pending",
+			Assignee: "kyew",
+			Objectives: []models.Objective{
+				{Done: true, Text: "Setup GO Server"},
+				{Done: true, Text: "Setup Templ"},
+				{Done: true, Text: "Setup Air"},
+				{Done: false, Text: "PUT RL ON M2"},
+			},
+			Rewards: []models.Reward{
+				{Text: "+1000 GO Exp"},
+				{Text: "+1000 Html Exp"},
+			},
+		},
+		{
+			Message:  "PostgreSQL setup quest",
+			Status:   "Pending",
+			Assignee: "kyew",
+			Objectives: []models.Objective{
+				{Done: false, Text: "INSTALL POSTGRE DB"},
+				{Done: false, Text: "INSTALL DOCKER DESKTOP"},
+			},
+			Rewards: []models.Reward{
+				{Text: "+1000 DB Exp"},
+				{Text: "+1000 Docker Exp"},
+			},
+		},
+		{
+			Message:  "Kyewgame Setup Quest",
+			Status:   "Pending",
+			Assignee: "kyew",
+			Objectives: []models.Objective{
+				{Done: false, Text: "Setup Project"},
+			},
+			Rewards: []models.Reward{
+				{Text: "+1000 Game Dev. Exp"},
+				{Text: "+1000 C++ Exp"},
+			},
+		},
 	}
 }

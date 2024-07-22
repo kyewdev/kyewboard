@@ -39,9 +39,9 @@ type Player struct {
 	Name       string
 	Level      int
 	Experience int
-	Skills     []Skill        `gorm:"foreignKey:PlayerID"`
+    Skills     []Skill        `gorm:"foreignKey:PlayerID;constraint:OnDelete:CASCADE"`
 	Stats      map[string]int `gorm:"-"`
-	Quests     []Quest        `gorm:"many2many:player_quests;"`
+	Quests     []Quest        `gorm:"many2many:player_quests;constraint:OnDelete:CASCADE"`
 }
 
 func (p *Player) GetQuestById(questId string) (*Quest) {
