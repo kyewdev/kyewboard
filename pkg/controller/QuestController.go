@@ -50,7 +50,7 @@ func (qc *QuestController) ToggleTask(c echo.Context) error {
 	objective, err := db.GetObjectiveByID(qc.Database, objectiveId)
 
 	if err != nil {
-		log.Fatalf("Couldnt get Objective with Id: %s, %d", objectiveId, err)
+		log.Printf("Couldnt get Objective with Id: %s, %d", objectiveId, err)
 	}
 	objective.Done = checked
 	db.SaveEntity(*objective, qc.Database)
@@ -84,7 +84,6 @@ func (qc *QuestController) DeleteQuest(c echo.Context) error {
         log.Printf(q.Message)
     }
     db.DeleteQuestByID(qc.Database, questIdint) 
-//	db.SaveEntity(*qc.PlayerModel, qc.Database)
     
 	return view.QuestPage(qc.PlayerModel.Quests).Render(context.Background(), c.Response().Writer)
 }

@@ -30,7 +30,7 @@ func SaveEntity(entity interface{}, database *gorm.DB) (error) {
 	result := database.Save(entity)
 
 	if result.Error != nil {
-		log.Fatalf("failed to save entity: %v", result.Error)
+		log.Printf("failed to save entity: %v", result.Error)
 	} else {
 		log.Printf("ENTITY SAVED; AFFECTED ROWS: %v", result.RowsAffected)
 	}
@@ -49,7 +49,7 @@ func GetQuestById(db *gorm.DB, questID int) (*models.Quest, error) {
 	if err := db.Preload("Objectives").Preload("Rewards").First(&quest, questID).Error; err != nil {
 		return nil, err
 	}
-    return &quest,nil
+    return &quest, nil
 }
 func GetObjectiveByID(database *gorm.DB, objectiveID string) (*models.Objective, error) {
 	var objective models.Objective

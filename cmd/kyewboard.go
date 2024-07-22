@@ -29,7 +29,7 @@ func main() {
 	playermodel, retrErr := db.GetPlayerById(database, 1)
     
 	if retrErr != nil {
-		log.Fatalf("failed to connect to the database: %v", retrErr)
+		log.Printf("failed to connect to the database: %v", retrErr)
         playermodel := NewPlayer()    
         db.SaveEntity(&playermodel, database)
         skills := NewSkillsForPlayer(1)
@@ -37,7 +37,7 @@ func main() {
         playermodel.Skills = skills
         playermodel.Quests = quests
         db.SaveEntity(&playermodel, database)
-        log.Print("setup skills and quests")
+        log.Printf("setup skills and quests")
 	}
 	qc := controller.NewQuestController(database, playermodel)
 	qc.RegisterRoutes(e)
