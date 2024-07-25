@@ -67,6 +67,15 @@ func GetRewardByID(database *gorm.DB, rewardID string) (*models.Reward, error) {
 	return &reward, nil
 }
 
+
+func GetSkillByID(database *gorm.DB, skillID string) (*models.Skill, error) {
+	var skill models.Skill
+	if err := database.First(&skill, skillID).Error; err != nil {
+		return nil, err
+	}
+	return &skill, nil
+}
+
 func DeletePlayerByID(db *gorm.DB, playerID int) error {
 	if err := db.Delete(&models.Player{}, playerID).Error; err != nil {
 		return fmt.Errorf("failed to delete player: %w", err)

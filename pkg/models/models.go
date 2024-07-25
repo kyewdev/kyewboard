@@ -1,7 +1,9 @@
 package models
 
-import "strconv"
+import (
+	"strconv"
 
+)
 
 type Quest struct {
 	ID         int `gorm:"primaryKey;autoIncrement"`
@@ -15,15 +17,13 @@ type Quest struct {
 }
 
 func (p *Player) CompleteQuest(q *Quest) {
-    // for _, reward := range q.Rewards {
-        
 }
 
 type Reward struct {
 	ID      int `gorm:"primaryKey;autoIncrement"`
-	Type    string
 	Text    string
 	Amount  int
+	SkillID int `gorm:"index"`
 	QuestID int `gorm:"index"`
 }
 
@@ -39,19 +39,19 @@ type Player struct {
 	Name       string
 	Level      int
 	Experience int
-    Skills     []Skill        `gorm:"foreignKey:PlayerID;constraint:OnDelete:CASCADE"`
+	Skills     []Skill        `gorm:"foreignKey:PlayerID;constraint:OnDelete:CASCADE"`
 	Stats      map[string]int `gorm:"-"`
 	Quests     []Quest        `gorm:"many2many:player_quests;constraint:OnDelete:CASCADE"`
 }
 
-func (p *Player) GetQuestById(questId string) (*Quest) {
-    
+func (p *Player) GetQuestById(questId string) *Quest {
+
 	for _, quest := range p.Quests {
-		if strconv.Itoa(quest.ID)== questId {
-            return &quest 	
+		if strconv.Itoa(quest.ID) == questId {
+			return &quest
 		}
 	}
-    return nil
+	return nil
 }
 
 func (p *Player) RemoveQuestByID(questID int) {
@@ -62,6 +62,7 @@ func (p *Player) RemoveQuestByID(questID int) {
 		}
 	}
 }
+
 type Skill struct {
 	ID          int `gorm:"primaryKey;autoIncrement"`
 	Category    string

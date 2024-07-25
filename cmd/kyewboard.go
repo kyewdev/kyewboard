@@ -24,20 +24,19 @@ func main() {
 	if migErr := db.Migrate(database); migErr != nil {
 		log.Fatalf("failed to migrate database: %v", migErr)
 	}
-    
 
 	playermodel, retrErr := db.GetPlayerById(database, 1)
-    
+
 	if retrErr != nil {
-		log.Printf("failed to connect to the database: %v", retrErr)
-        playermodel := NewPlayer()    
-        db.SaveEntity(&playermodel, database)
-        skills := NewSkillsForPlayer(1)
-        quests := NewQuestsForPlayer(1)
-        playermodel.Skills = skills
-        playermodel.Quests = quests
-        db.SaveEntity(&playermodel, database)
-        log.Printf("setup skills and quests")
+		log.Printf("failed to retrieve player: %v", retrErr)
+		playermodel := NewPlayer()
+		db.SaveEntity(&playermodel, database)
+		skills := NewSkillsForPlayer(1)
+		quests := NewQuestsForPlayer(1)
+		playermodel.Skills = skills
+		playermodel.Quests = quests
+		db.SaveEntity(&playermodel, database)
+		log.Printf("setup skills and quests")
 	}
 	qc := controller.NewQuestController(database, playermodel)
 	qc.RegisterRoutes(e)
@@ -66,7 +65,6 @@ func main() {
 	e.Logger.Fatal(e.Start(":42069"))
 }
 
-
 func NewPlayer() models.Player {
 	stats := map[string]int{
 		"Vitality":    0,
@@ -84,14 +82,13 @@ func NewPlayer() models.Player {
 	}
 }
 
-
 func NewSkillsForPlayer(playerID int) []models.Skill {
 	return []models.Skill{
-		{Title: "Development", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
-		{Title: "IT Security", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
-		{Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1, PlayerID: playerID},
-		{Title: "Gardening", Category: "Biology", Level: 1, Experience: 1, PlayerID: playerID},
-		{Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1, PlayerID: playerID},
+		{ID: 1, Title: "Development", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
+		{ID: 2, Title: "IT Security", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
+		{ID: 3, Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1, PlayerID: playerID},
+		{ID: 4, Title: "Gardening", Category: "Biology", Level: 1, Experience: 1, PlayerID: playerID},
+		{ID: 5, Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1, PlayerID: playerID},
 	}
 }
 
@@ -108,8 +105,7 @@ func NewQuestsForPlayer(playerID int) []models.Quest {
 				{Done: false, Text: "PUT RL ON M2"},
 			},
 			Rewards: []models.Reward{
-				{Text: "+1000 GO Exp"},
-				{Text: "+1000 Html Exp"},
+				{Text: "+400 Dev Exp", SkillID: 1, Amount: 400},
 			},
 		},
 		{
@@ -121,8 +117,7 @@ func NewQuestsForPlayer(playerID int) []models.Quest {
 				{Done: false, Text: "INSTALL DOCKER DESKTOP"},
 			},
 			Rewards: []models.Reward{
-				{Text: "+1000 DB Exp"},
-				{Text: "+1000 Docker Exp"},
+				{Text: "+400 Dev Exp", SkillID: 1, Amount: 400},
 			},
 		},
 		{
@@ -133,8 +128,7 @@ func NewQuestsForPlayer(playerID int) []models.Quest {
 				{Done: false, Text: "Setup Project"},
 			},
 			Rewards: []models.Reward{
-				{Text: "+1000 Game Dev. Exp"},
-				{Text: "+1000 C++ Exp"},
+				{Text: "+500 Game Dev. Exp", SkillID: 1, Amount: 500},
 			},
 		},
 	}
