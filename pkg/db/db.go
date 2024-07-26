@@ -27,7 +27,7 @@ func Migrate(db *gorm.DB) error {
 }
 
 func SaveEntity(entity interface{}, database *gorm.DB) (error) {
-	result := database.Save(entity)
+	result := database.Session(&gorm.Session{FullSaveAssociations: true}).Save(entity)
 
 	if result.Error != nil {
 		log.Printf("failed to save entity: %v", result.Error)
@@ -44,9 +44,9 @@ func GetPlayerById(db *gorm.DB, playerID int) (*models.Player, error) {
 	return &player, nil
 }
 
-func GetQuestById(db *gorm.DB, questID int) (*models.Quest, error) {
+func GetQuestById(db *gorm.DB, questID string) (*models.Quest, error) {
     var quest models.Quest
-	if err := db.Preload("Objectives").Preload("Rewards").First(&quest, questID).Error; err != nil {
+	if err := db.Preload("Objectives").Preload("Rewards").Preload("Rewards.Skill").First(&quest, questID).Error; err != nil {
 		return nil, err
 	}
     return &quest, nil

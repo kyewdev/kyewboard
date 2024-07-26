@@ -2,7 +2,6 @@ package models
 
 import (
 	"strconv"
-
 )
 
 type Quest struct {
@@ -16,15 +15,13 @@ type Quest struct {
 	Category   string
 }
 
-func (p *Player) CompleteQuest(q *Quest) {
-}
-
 type Reward struct {
 	ID      int `gorm:"primaryKey;autoIncrement"`
 	Text    string
 	Amount  int
 	SkillID int `gorm:"index"`
 	QuestID int `gorm:"index"`
+	Skill   Skill
 }
 
 type Objective struct {

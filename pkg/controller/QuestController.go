@@ -37,12 +37,18 @@ func (qc *QuestController) RegisterRoutes(e *echo.Echo) {
 
 func (qc *QuestController) CompleteQuest(c echo.Context) error {
 	questId := c.FormValue("questId")
-	quest := qc.PlayerModel.GetQuestById(questId)
-	if quest == nil {
+	quest, err := db.GetQuestById(qc.Database, questId)
+	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
+
+    for _, reward := range quest.Rewards{
+        reward.Skill.Experience += reward.Amount
+        db.SaveEntity(reward.Skill, qc.Database)
+    }
 	return view.QuestPage(qc.PlayerModel.Quests).Render(context.Background(), c.Response().Writer)
 }
+
 
 func (qc *QuestController) ToggleTask(c echo.Context) error {
 	checked := c.FormValue("taskcheckbox") == "on"

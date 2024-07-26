@@ -7,6 +7,7 @@ import (
 	"kyewboard/pkg/models"
 	"kyewboard/pkg/view"
 	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -55,6 +56,13 @@ func main() {
 	})
 
 	e.GET("/skills", func(c echo.Context) error {
+        playermodel, err := db.GetPlayerById(database,1)
+
+        if err != nil {
+            log.Printf("couldt load player for skills")
+            return c.NoContent(http.StatusInternalServerError) 
+        }
+
 		return view.Skills(*playermodel).Render(context.Background(), c.Response().Writer)
 	})
 
