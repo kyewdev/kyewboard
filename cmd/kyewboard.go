@@ -15,6 +15,8 @@ import (
 
 func main() {
 	e := echo.New()
+	var playermodel *models.Player
+
 	e.Use(middleware.Logger())
 
 	database, connErr := db.Connect()
@@ -26,20 +28,19 @@ func main() {
 		log.Fatalf("failed to migrate database: %v", migErr)
 	}
 
-	playermodel, retrErr := db.GetPlayerById(database, 1)
+	playermodel = db.GetPlayerById(database, 1)
 
-	if retrErr != nil {
-		log.Printf("failed to retrieve player: %v", retrErr)
-		playermodel := NewPlayer()
+	if playermodel == nil {
+		playermodel =  NewPlayer()
 		db.SaveEntity(&playermodel, database)
-		skills := NewSkillsForPlayer(1)
-		quests := NewQuestsForPlayer(1)
+		skills := NewSkills()
+		quests := NewQuests()
 		playermodel.Skills = skills
-		playermodel.Quests = quests
 		db.SaveEntity(&playermodel, database)
+        db.SaveEntity(&quests, database)
 		log.Printf("setup skills and quests")
 	}
-	qc := controller.NewQuestController(database, playermodel)
+	qc := controller.NewQuestController(database)
 	qc.RegisterRoutes(e)
 	index := view.Index(*playermodel)
 
@@ -52,16 +53,22 @@ func main() {
 
 	//////////// PAGES /////////////////////////
 	e.GET("/quests", func(c echo.Context) error {
-		return view.QuestPage(playermodel.Quests).Render(context.Background(), c.Response().Writer)
+        var quests []models.Quest
+        quests, err := db.GetPendingQuests(database)
+		if err != nil {
+            log.Printf("Couldnt retrieve pending quests QUESTS: %v", err)
+
+		}
+		return view.QuestPage(quests).Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/skills", func(c echo.Context) error {
-        playermodel, err := db.GetPlayerById(database,1)
+		playermodel := db.GetPlayerById(database, 1)
 
-        if err != nil {
-            log.Printf("couldt load player for skills")
-            return c.NoContent(http.StatusInternalServerError) 
-        }
+		if playermodel == nil {
+			log.Printf("couldt load player for skills")
+			return c.NoContent(http.StatusInternalServerError)
+		}
 
 		return view.Skills(*playermodel).Render(context.Background(), c.Response().Writer)
 	})
@@ -73,7 +80,7 @@ func main() {
 	e.Logger.Fatal(e.Start(":42069"))
 }
 
-func NewPlayer() models.Player {
+func NewPlayer() *models.Player {
 	stats := map[string]int{
 		"Vitality":    0,
 		"Strength":    0,
@@ -81,7 +88,7 @@ func NewPlayer() models.Player {
 		"Sense":       0,
 		"Agility":     0,
 	}
-	return models.Player{
+	return &models.Player{
 		Stats:      stats,
 		Experience: 0,
 		Level:      1,
@@ -90,17 +97,17 @@ func NewPlayer() models.Player {
 	}
 }
 
-func NewSkillsForPlayer(playerID int) []models.Skill {
+func NewSkills() []models.Skill {
 	return []models.Skill{
-		{ID: 1, Title: "Development", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
-		{ID: 2, Title: "IT Security", Category: "IT", Level: 1, Experience: 1, PlayerID: playerID},
-		{ID: 3, Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1, PlayerID: playerID},
-		{ID: 4, Title: "Gardening", Category: "Biology", Level: 1, Experience: 1, PlayerID: playerID},
-		{ID: 5, Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1, PlayerID: playerID},
+		{ID: 1, Title: "Development", Category: "IT", Level: 1, Experience: 1, },
+		{ID: 2, Title: "IT Security", Category: "IT", Level: 1, Experience: 1, },
+		{ID: 3, Title: "Skateboarding", Category: "Sport", Level: 1, Experience: 1, },
+		{ID: 4, Title: "Gardening", Category: "Biology", Level: 1, Experience: 1, },
+		{ID: 5, Title: "Rocketleague", Category: "Esport", Level: 1, Experience: 1, },
 	}
 }
 
-func NewQuestsForPlayer(playerID int) []models.Quest {
+func NewQuests() []models.Quest {
 	return []models.Quest{
 		{
 			Message:  "Kyewboard setup quest",

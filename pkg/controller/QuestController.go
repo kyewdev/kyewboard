@@ -4,24 +4,22 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"kyewboard/pkg/db"
 	"kyewboard/pkg/models"
 	"kyewboard/pkg/view"
 	"log"
 	"net/http"
 	"strconv"
-	"gorm.io/gorm"
 )
 
 type QuestController struct {
-	Database    *gorm.DB
-	PlayerModel *models.Player
+	Database *gorm.DB
 }
 
-func NewQuestController(database *gorm.DB, playerModel *models.Player) *QuestController {
+func NewQuestController(database *gorm.DB) *QuestController {
 	return &QuestController{
-		Database:    database,
-		PlayerModel: playerModel,
+		Database: database,
 	}
 }
 
@@ -34,7 +32,6 @@ func (qc *QuestController) RegisterRoutes(e *echo.Echo) {
 	e.POST("/quests/add", qc.AddQuest)
 }
 
-
 func (qc *QuestController) CompleteQuest(c echo.Context) error {
 	questId := c.FormValue("questId")
 	quest, err := db.GetQuestById(qc.Database, questId)
@@ -42,13 +39,15 @@ func (qc *QuestController) CompleteQuest(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-    for _, reward := range quest.Rewards{
-        reward.Skill.Experience += reward.Amount
-        db.SaveEntity(reward.Skill, qc.Database)
-    }
-	return view.QuestPage(qc.PlayerModel.Quests).Render(context.Background(), c.Response().Writer)
-}
+	for _, reward := range quest.Rewards {
+		reward.Skill.Experience += reward.Amount
+		db.SaveEntity(reward.Skill, qc.Database)
+	}
 
+	quest.Status = "Done"
+	db.SaveEntity(quest, qc.Database)
+	return c.HTML(http.StatusOK, "")
+}
 
 func (qc *QuestController) ToggleTask(c echo.Context) error {
 	checked := c.FormValue("taskcheckbox") == "on"
@@ -84,24 +83,28 @@ func (qc *QuestController) DeleteQuest(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusBadRequest, fmt.Sprintf("Invalid quest_id: %v", err))
 	}
-	log.Printf("WOULD DELETE QUEST: %d", questIdint)
-	qc.PlayerModel.RemoveQuestByID(questIdint)
-    for _, q := range qc.PlayerModel.Quests {
-        log.Printf(q.Message)
-    }
-    db.DeleteQuestByID(qc.Database, questIdint) 
-    
-	return view.QuestPage(qc.PlayerModel.Quests).Render(context.Background(), c.Response().Writer)
+	dberr := db.DeleteQuestByID(qc.Database, questIdint)
+	if dberr != nil {
+		return c.String(http.StatusBadRequest, fmt.Sprintf("Invalid quest_id: %v", dberr))
+	}
+
+	return c.NoContent(http.StatusOK)
 }
 
-
-
 func (qc *QuestController) AddQuest(c echo.Context) error {
+
 	if err := c.Request().ParseForm(); err != nil {
 		return c.String(http.StatusBadRequest, "Failed to parse form data")
 	}
 
+    quests, qerr := db.GetPendingQuests(qc.Database)
+    if qerr != nil {
+        return c.NoContent(http.StatusNoContent)
+    }
+
 	rewardStrings := c.Request().Form["editableReward"]
+    // TODO --> GET SKILLS AS COMBOBOX
+    //TODO GET AMOUNT as NR?
 	if len(rewardStrings) == 0 {
 		return c.NoContent(http.StatusNoContent)
 	}
@@ -130,15 +133,15 @@ func (qc *QuestController) AddQuest(c echo.Context) error {
 	title := c.FormValue("editableTitle")
 
 	newQuest := models.Quest{
-		ID:         len(qc.PlayerModel.Quests) + 1,
 		Message:    title,
 		Status:     "Pending",
 		Objectives: objectives,
 		Rewards:    rewards,
 		Assignee:   "kyew",
 	}
-	qc.PlayerModel.Quests = append(qc.PlayerModel.Quests, newQuest)
-	db.SaveEntity(*qc.PlayerModel, qc.Database)
 
-	return view.QuestPage(qc.PlayerModel.Quests).Render(context.Background(), c.Response().Writer)
+	db.SaveEntity(&newQuest, qc.Database)
+
+
+	return view.QuestPage(quests).Render(context.Background(), c.Response().Writer)
 }

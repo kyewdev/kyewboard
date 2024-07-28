@@ -13,8 +13,8 @@ import (
 func Connect() (*gorm.DB, error) {
 	dsn := "host=localhost user=postgres password=kyewroot dbname=kyewboard port=8181 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-        Logger: logger.Default.LogMode(logger.Info),
-    })
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 
 	if err != nil {
 		return nil, err
@@ -23,10 +23,10 @@ func Connect() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&models.Quest{}, &models.Objective{}, &models.Reward{}, &models.Player{}, &models.Skill{}, &models.PlayerQuest{})
+	return db.AutoMigrate(&models.Quest{}, &models.Objective{}, &models.Reward{}, &models.Player{}, &models.Skill{}) 
 }
 
-func SaveEntity(entity interface{}, database *gorm.DB) (error) {
+func SaveEntity(entity interface{}, database *gorm.DB) error {
 	result := database.Session(&gorm.Session{FullSaveAssociations: true}).Save(entity)
 
 	if result.Error != nil {
@@ -34,23 +34,32 @@ func SaveEntity(entity interface{}, database *gorm.DB) (error) {
 	} else {
 		log.Printf("ENTITY SAVED; AFFECTED ROWS: %v", result.RowsAffected)
 	}
-    return result.Error
+	return result.Error
 }
-func GetPlayerById(db *gorm.DB, playerID int) (*models.Player, error) {
+func GetPlayerById(db *gorm.DB, playerID int) *models.Player {
 	var player models.Player
-	if err := db.Preload("Skills").Preload("Quests").Preload("Quests.Objectives").Preload("Quests.Rewards").First(&player, playerID).Error; err != nil {
-		return nil, err
+	if err := db.Preload("Skills").First(&player, playerID).Error; err != nil {
+		log.Printf("Couldn't load player with ID: %v", playerID)
+		return nil
 	}
-	return &player, nil
+	return &player
 }
 
 func GetQuestById(db *gorm.DB, questID string) (*models.Quest, error) {
-    var quest models.Quest
+	var quest models.Quest
 	if err := db.Preload("Objectives").Preload("Rewards").Preload("Rewards.Skill").First(&quest, questID).Error; err != nil {
 		return nil, err
 	}
-    return &quest, nil
+	return &quest, nil
 }
+func GetPendingQuests(db *gorm.DB) ([]models.Quest, error) {
+    var quests []models.Quest
+	if err := db.Preload("Objectives").Preload("Rewards").Where("status = ?", "Pending").Find(&quests).Error; err != nil {
+		return nil, err
+	}
+	return quests, nil
+}
+
 func GetObjectiveByID(database *gorm.DB, objectiveID string) (*models.Objective, error) {
 	var objective models.Objective
 	if err := database.First(&objective, objectiveID).Error; err != nil {
@@ -67,7 +76,6 @@ func GetRewardByID(database *gorm.DB, rewardID string) (*models.Reward, error) {
 	return &reward, nil
 }
 
-
 func GetSkillByID(database *gorm.DB, skillID string) (*models.Skill, error) {
 	var skill models.Skill
 	if err := database.First(&skill, skillID).Error; err != nil {
@@ -82,7 +90,6 @@ func DeletePlayerByID(db *gorm.DB, playerID int) error {
 	}
 	return nil
 }
-
 
 func DeleteQuestByID(db *gorm.DB, questID int) error {
 	if err := db.Delete(&models.Quest{}, questID).Error; err != nil {
