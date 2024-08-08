@@ -70,7 +70,8 @@ func (qc *QuestController) ToggleTask(c echo.Context) error {
 }
 
 func (qc *QuestController) GetEditableReward(c echo.Context) error {
-	return view.EditableReward().Render(context.Background(), c.Response().Writer)
+    player := db.GetPlayerById(qc.Database, 1)
+	return view.EditableReward(player.Skills).Render(context.Background(), c.Response().Writer)
 }
 
 func (qc *QuestController) GetEditableObjective(c echo.Context) error {

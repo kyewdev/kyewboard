@@ -57,7 +57,6 @@ func main() {
         quests, err := db.GetPendingQuests(database)
 		if err != nil {
             log.Printf("Couldnt retrieve pending quests QUESTS: %v", err)
-
 		}
 		return view.QuestPage(quests).Render(context.Background(), c.Response().Writer)
 	})

@@ -14,15 +14,17 @@ templ MiniQuest() {
 templ QuestPage(quests []models.Quest) {
 	<div id="content" class="container mx-auto mt-4">
 		<div id="quests" class="container  space-y-4">
+			<div class="max-w-2xl mx-auto p-6 mt-8 relative">
+				<button class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/4 justify-center rounded-lg">New Quest</button>
+			</div>
 			for _, quest:= range quests {
 				@Quest(quest)
 			}
-			@EditableQuest()
 		</div>
 	</div>
 }
 
-templ EditableQuest() {
+templ EditableQuest(skills []models.Skill) {
 	<div class="max-w-2xl mx-auto p-6 mt-8" id="editable-quest">
 		<div class="w-full bg-blue-900 border border-[#daf6fc] bg-opacity-60 p-6 rounded-lg inline-block shadow-md">
 			<div class="text-center mb-4 flex justify-center">
@@ -36,13 +38,13 @@ templ EditableQuest() {
 				/>
 			</div>
 			<div class="w-full flex flex-row space-x-4 justify-evenly">
-				<div class="w-2/3 container justify-evenly">
+				<div class="w-1/2 container justify-evenly">
 					<p class="text-left text-[#daf6fc] lock font-bold font-morpheus mb-2">Objectives:</p>
 					@EditableObjective()
 				</div>
-				<div class="w-1/3 container justify-evenly">
+				<div class="w-1/2 container justify-evenly">
 					<p class="text-left  text-[#daf6fc] font-bold font-morpheus">Rewards:</p>
-					@EditableReward()
+					@EditableReward(skills)
 				</div>
 			</div>
 			@AddQuestBtn()
@@ -88,22 +90,22 @@ templ Reward(reward string) {
 }
 
 templ CompleteBtn(questId int) {
-	<form 
-        class="flex w-full mt-4 justify-center"
-        hx-post="/quests/complete"
-        hx-trigger="click"
-        hx-target="closest #quest"
-        hx-include="find #completed-quest-id"
-    >
-	    <button
+	<form
+		class="flex w-full mt-4 justify-center"
+		hx-post="/quests/complete"
+		hx-trigger="click"
+		hx-target="closest #quest"
+		hx-include="find #completed-quest-id"
+	>
+		<button
 			class="border border-blue-500 hover:bg-blue-700 py-2 px-4 w-1/2 justify-center rounded-lg"
 		>Complete Quest</button>
 		<input type="hidden" id="completed-quest-id" value={ strconv.Itoa(questId) } name="questId"/>
 	</form>
 }
 
-templ EditableReward() {
-	<div id="editable-reward-div" class="flex justify-between w-full relative">
+templ EditableReward(skills []models.Skill) {
+	<form id="editable-reward-div" class="flex justify-between w-full relative">
 		<input
 			type="text"
 			id="editable-reward"
@@ -116,7 +118,19 @@ templ EditableReward() {
 			hx-swap="afterend"
 			hx-target="closest #editable-reward-div"
 		/>
-	</div>
+		<input
+			type="number"
+			step="100"
+			value="500"
+			id="exp-amount"
+			class="w-full bg-transparent border-none border-[#daf6fc]  focus:outline-none"
+		/>
+		<select class="w-full bg-transparent border-none border-[#daf6fc]  focus:outline-none">
+			for _, skill := range skills {
+				<option value="dev">{ skill.Title }</option>
+			}
+		</select>
+	</form>
 }
 
 templ EditableObjective() {
