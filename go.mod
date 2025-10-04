@@ -2,6 +2,8 @@ module kyewboard
 
 go 1.23.0
 
+toolchain go1.24.7
+
 require (
 	github.com/a-h/templ v0.3.943
 	github.com/labstack/echo/v4 v4.12.0
