@@ -45,7 +45,7 @@ func main() {
 	index := view.Index(*playermodel)
 
 	/////////////BASE //////////////////
-	e.Static("/static", "/assets")
+	e.Static("/static", "assets")
 
 	e.GET("/", func(c echo.Context) error {
 		return index.Render(context.Background(), c.Response().Writer)
