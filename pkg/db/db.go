@@ -52,11 +52,21 @@ func GetQuestById(db *gorm.DB, questID string) (*models.Quest, error) {
 	}
 	return &quest, nil
 }
+
 func GetPendingQuests(db *gorm.DB) ([]models.Quest, error) {
     var quests []models.Quest
 	if err := db.Preload("Objectives").Preload("Rewards").Where("status = ?", "Pending").Find(&quests).Error; err != nil {
 		return nil, err
 	}
+	return quests, nil
+}
+
+func GetAllQuests(db *gorm.DB) ([]models.Quest, error) {
+	var quests []models.Quest
+	if err := db.Preload("Objectives").Preload("Rewards").Find(&quests).Error; err != nil {
+		return nil, err
+	}
+
 	return quests, nil
 }
 

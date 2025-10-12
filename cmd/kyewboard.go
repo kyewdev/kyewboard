@@ -54,7 +54,7 @@ func main() {
 	//////////// PAGES /////////////////////////
 	e.GET("/quests", func(c echo.Context) error {
         var quests []models.Quest
-        quests, err := db.GetPendingQuests(database)
+        quests, err := db.GetAllQuests(database)
 		if err != nil {
             log.Printf("Couldnt retrieve pending quests QUESTS: %v", err)
 		}

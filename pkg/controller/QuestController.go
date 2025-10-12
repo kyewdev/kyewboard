@@ -39,14 +39,24 @@ func (qc *QuestController) CompleteQuest(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	for _, reward := range quest.Rewards {
-		reward.Skill.Experience += reward.Amount
-		db.SaveEntity(reward.Skill, qc.Database)
+	
+	if quest.Status == "Pending" {
+		for _, reward := range quest.Rewards {
+			reward.Skill.Experience += reward.Amount
+			db.SaveEntity(reward.Skill, qc.Database)
+		}
+		quest.Status = "Done"
+			
+	} else {
+		for _, reward := range quest.Rewards {
+			reward.Skill.Experience -= reward.Amount
+			db.SaveEntity(reward.Skill, qc.Database)
+		}
+		quest.Status = "Pending"
 	}
 
-	quest.Status = "Done"
 	db.SaveEntity(quest, qc.Database)
-	return c.HTML(http.StatusOK, "")
+	return view.Quest(*quest).Render(context.Background(), c.Response().Writer)
 }
 
 func (qc *QuestController) ToggleTask(c echo.Context) error {
