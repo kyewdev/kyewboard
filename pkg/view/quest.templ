@@ -94,6 +94,7 @@ templ CompleteBtn(questId int) {
 		class="flex w-full mt-4 justify-center"
 		hx-post="/quests/complete"
 		hx-trigger="click"
+        hx-swap="outerHTML"
 		hx-target="closest #quest"
 		hx-include="find #completed-quest-id"
 	>
