@@ -9,6 +9,7 @@ templ Status(player models.Player) {
 			<h2 class="text-2xl text-center font-bold font-morpheus text-[#daf6fc] mb-4">Status</h2>
 			<p class="mb-2"><strong>Name:</strong> { player.Name }</p>
 			<p class="mb-2"><strong>Level:</strong> { strconv.Itoa(player.Level) }</p>
+			<p class="mb-2"><strong>Experience:</strong> { strconv.Itoa(player.Experience) }</p>
 			<div class="bg-blue-400 bg-opacity-20 p-4 rounded-lg">
 				<p class="mb-2"><strong>Strength:</strong> 120</p>
 				<p class="mb-2"><strong>Agility:</strong> 110</p>
